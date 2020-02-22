@@ -5,7 +5,7 @@ pub mod players;
 pub mod enemys;
 use enemys::Enemy;
 use players::Player;
-
+// use std::{thread, time};
 
 static LEVELS: [i32; 12] = [5, 10, 20, 40, 80, 150, 200, 250, 400, 600, 800, 1000];
 
@@ -40,10 +40,9 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
             Some("inv") => player.display_inventory(),
             Some("help") => println!("available commands: attack, cast <spell/buff name>, stats, inv"),
 
-            None => println!("unknown command type help for availible commands"),
-            _ => println!("unknown command type help for availible commands"),
+            None => println!("unknown command type 'help' for availible commands"),
+            _ => println!("unknown command type 'help' for availible commands"),
         }
-
     }
     println!("The {} is defeated!", enemy.name);
     println!(" {:-<15}+", "+");
@@ -68,12 +67,13 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
 
 fn main() {
     let mut player = Player::new();
+    println!("Welcome, at any point you can enter 'help' to get information on commands");
     player.level_up(3, 0, true);
 
     println!("
     With a snap dust fills the air and your feet hit the floor. 
     Your eyes are open for the first time. 
-    A doorway is doorless across the room from you. 
+    A doorway is wide open across the room from you. 
     You are compelled to go through... \n");
 
     loop {

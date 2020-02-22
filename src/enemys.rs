@@ -1,5 +1,6 @@
 use crate::players::Player;
 use rand::prelude::*;
+use std::{thread, time};
 
 #[derive(Copy, Clone)]
 pub struct Enemy {
@@ -32,6 +33,7 @@ impl Enemy {
                 player.health -= dmg_amt;
                 println!("The {} {} you for {} damage \nYou have {} health", self.name, self.atk_txt, dmg_amt, player.health)
             }
+            thread::sleep(time::Duration::from_millis(600));
         }
     }
 }

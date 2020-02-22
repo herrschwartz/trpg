@@ -3,6 +3,8 @@ use crate::items::Armor;
 use crate::enemys::Enemy;
 use rand::prelude::*;
 use std::io::stdin;
+use std::{thread, time};
+
 
 pub struct Player {
     pub health: i32,
@@ -28,8 +30,8 @@ impl Player {
             max_health: 10,
             exp: 0,
             level: 1,
-            weapon: Weapon {name: "Fists", damage: 0, speed: 1, crit: 2, atk_txt: "punch"},
-            armor: Armor {name: "Cloth Tunic", value: 0, magic_res: 0},
+            weapon: Weapon {name: "Fists", damage: 0, speed: 1, crit: 2, atk_txt: "punch", crit_txt: "smash", rank: 0},
+            armor: Armor {name: "Cloth Tunic", value: 0, magic_res: 0, rank: 0},
             strength: 3,
             int: 3,
             resolve: 2,
@@ -49,11 +51,12 @@ impl Player {
 
             if self.weapon.crit >= self.gen.gen_range(1, 101) {
                 target.health -= dmg_amt * 2;
-                println!("you crit the {} with your {} for {} damage! nice", target.name, self.weapon.name, dmg_amt * 2);
+                println!("you {} the {} with your {} for {} damage!", self.weapon.crit_txt, target.name, self.weapon.name, dmg_amt * 2);
             } else {
                 target.health -= dmg_amt;
                 println!("you {} the {} with your {} for {} damage", self.weapon.atk_txt, target.name, self.weapon.name, dmg_amt);
             }
+            thread::sleep(time::Duration::from_millis(600));
         }
         println!("");
         if target.health <= 0 {
@@ -61,6 +64,7 @@ impl Player {
         }
 
         //enemy retaliation
+        thread::sleep(time::Duration::from_millis(600));
         target.attack(num_atks_enemy, self);
     }
 
@@ -96,7 +100,6 @@ impl Player {
         }
 
         self.display_stats();
-        println!("At any point you can enter 'help' to get information on commands");
         println!("enter the name of the stat you want to increase: strength, intellect, devotion, resolve");
         while choice > 0 {
 
@@ -111,7 +114,7 @@ impl Player {
                 Some("intellect") => {self.int += 1; println!("Your intellect increases by 1"); choice -= 1},
                 Some("devotion") => {self.devotion += 1; println!("Your devotion increases by 1"); choice -= 1},
                 Some("resolve") => {self.resolve += 1; println!("Your resolve increases by 1"); choice -= 1},
-                Some("help") => println!("To incearse a stat type the name of it and press enter.
+                Some("help") => println!("To improve a stat type the name of the stat and press enter.
                 Strength - increases damage done by phsycial attacks
                 Intellect - increases damage done by spells
                 Devotion - increase your chance of getting spells and boons
