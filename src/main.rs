@@ -35,7 +35,9 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
         let mut commands = cleaned.split_whitespace();
         match commands.next() {
             Some("attack") => player.attack(&mut enemy),
-            Some("cast") => println!("spell {}", commands.next().unwrap_or("")),
+            Some("cast") => player.cast_spell(&mut enemy, commands.map(|x| x.to_string())
+                                                                            .collect::<Vec<String>>()
+                                                                            .join(" ")),
             Some("stats") => player.display_stats(),
             Some("inv") => player.display_inventory(),
             Some("help") => println!("available commands: attack, cast <spell/buff name>, stats, inv"),

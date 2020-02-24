@@ -76,7 +76,7 @@ pub fn load_t1() -> Vec<Enemy>{
             crit: 3,
             tier: 1,
             atk_txt: "headbutts",
-            entry_txt: "It's hard to see anything in this room, but you hear a low scraping sound as what looks like a rock inches toward you \n"
+            entry_txt: "It's hard to see anything in this room, but you hear a low scraping sound as what appears to be a rock inches towards you \n"
         },
         Enemy {
             name: "Thief",

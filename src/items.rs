@@ -11,11 +11,14 @@ impl Buff {
 
     }
 }
-
+#[derive(Debug)]
 pub struct Spell {
     pub name: &'static str,
     pub description: &'static str,
     pub speed: i32,
+    pub damage: i32,
+
+    pub atk_txt: &'static str,
 }
 
 pub struct Weapon {

@@ -1,6 +1,8 @@
 use crate::items::Weapon;
 use crate::items::Armor;
+use crate:: items::Spell;
 use crate::enemys::Enemy;
+use crate::LEVELS;
 use rand::prelude::*;
 use std::io::stdin;
 use std::{thread, time};
@@ -13,6 +15,7 @@ pub struct Player {
     pub level: i32,
     pub weapon: Weapon,
     pub armor: Armor,
+    pub spells: Vec<Spell>,
 
     pub strength: i32,
     pub int: i32,
@@ -32,6 +35,7 @@ impl Player {
             level: 1,
             weapon: Weapon {name: "Fists", damage: 0, speed: 1, crit: 2, atk_txt: "punch", crit_txt: "smash", rank: 0},
             armor: Armor {name: "Cloth Tunic", value: 0, magic_res: 0, rank: 0},
+            spells: vec![Spell{name: "arcane bolt", description: "A basic bolt of magic energy", speed: 1, damage: 2, atk_txt: "Your hands fume with perverse energies, they coalese into a dense bead "}],
             strength: 3,
             int: 3,
             resolve: 2,
@@ -68,17 +72,40 @@ impl Player {
         target.attack(num_atks_enemy, self);
     }
 
+    pub fn cast_spell(&mut self, target: &mut Enemy, spell_name: String) {
+        let spell = self.spells.iter().find(|&x| x.name == spell_name); 
+        match spell {
+            Some(spell) => {
+                let mut num_atks_enemy: i32 = spell.speed / target.speed;
+                if num_atks_enemy < 1 {num_atks_enemy = 1}
+
+                let mut dmg = spell.damage + self.int - target.magic_res;
+                if dmg < 0 {dmg = 0}
+                target.health -= dmg;
+                println!("{} and you hit the {} for {}", spell.atk_txt, target.name, dmg);
+
+                println!("");
+                if target.health <= 0 {
+                    return 
+                }
+                target.attack(num_atks_enemy, self);
+            },
+            None => println!("You don't have {}", spell_name)
+        }
+    }
+    
+
     pub fn display_stats(&self) {
         println!("
         Level     {} \n
         Health    {}/{} \n 
-        Exp       {} \n
+        Exp       {}/{} \n
         Strength  {} \n
         Intellect {} \n
         Devotion  {} \n
         Resolve   {} \n
-        ", self.level, self.health, self.max_health, self.exp, self.strength,
-           self.int, self.devotion, self.resolve)
+        ", self.level, self.health, self.max_health, self.exp, LEVELS[(self.level - 1) as usize], 
+         self.strength, self.int, self.devotion, self.resolve)
     }
 
     pub fn level_up(&mut self, mut choice: i32, random: i32, is_special: bool) {
@@ -130,6 +157,10 @@ impl Player {
         println!("--------- equipped ---------");
         println!("Weapon: {} - dmg {} spd {} crit {}%", self.weapon.name, self.weapon.damage, self.weapon.speed, self.weapon.crit);
         println!("Armor: {} - armor {} magic {}", self.armor.name, self.armor.value, self.armor.magic_res);
-        println!("----------------------------")
+        println!("---------------------------- \n");
+        for s in &self.spells {
+            println!("{} - {}", s.name, s.description);
+            println!("-");
+        }
     }
 }
