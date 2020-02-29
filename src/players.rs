@@ -35,7 +35,9 @@ impl Player {
             level: 1,
             weapon: Weapon {name: "Fists", damage: 0, speed: 1, crit: 2, atk_txt: "punch", crit_txt: "smash", rank: 0},
             armor: Armor {name: "Cloth Tunic", value: 0, magic_res: 0, rank: 0},
-            spells: vec![Spell{name: "arcane bolt", description: "A basic bolt of magic energy", speed: 1, damage: 2, atk_txt: "Your hands fume with perverse energies, they coalese into a dense bead "}],
+            spells: vec![Spell{name: "arcane bolt", description: "A basic bolt of magic energy", 
+                        speed: 1, damage: 2, kind: "arcane",
+                        atk_txt: "Your hands fume with perverse energies, they coalese into a dense bead"}],
             strength: 3,
             int: 3,
             resolve: 2,
@@ -73,13 +75,19 @@ impl Player {
     }
 
     pub fn cast_spell(&mut self, target: &mut Enemy, spell_name: String) {
-        let spell = self.spells.iter().find(|&x| x.name == spell_name); 
-        match spell {
-            Some(spell) => {
+        let spell_pos = self.spells.iter().position(|x| x.name == spell_name); 
+        match spell_pos {
+            Some(spell_pos) => {
+                let spell = &self.spells[spell_pos];
                 let mut num_atks_enemy: i32 = spell.speed / target.speed;
                 if num_atks_enemy < 1 {num_atks_enemy = 1}
 
-                let mut dmg = spell.damage + self.int - target.magic_res;
+                let mut dmg = match spell.kind {
+                    "arcane"    => spell.damage + self.int - target.magic_res,
+                    "lightning" => spell.damage + self.gen.gen_range(self.int/2, self.int + 1) + self.gen.gen_range(0, self.int) - target.magic_res,
+                    "fire"      => spell.damage - target.magic_res,
+                    _ => panic!("invalid spell type")
+                };
                 if dmg < 0 {dmg = 0}
                 target.health -= dmg;
                 println!("{} and you hit the {} for {}", spell.atk_txt, target.name, dmg);
@@ -88,7 +96,11 @@ impl Player {
                 if target.health <= 0 {
                     return 
                 }
+                //enemy attacks back
                 target.attack(num_atks_enemy, self);
+
+                //remove used spell from inventory
+                self.spells.remove(spell_pos);
             },
             None => println!("You don't have {}", spell_name)
         }

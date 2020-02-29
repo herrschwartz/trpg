@@ -36,60 +36,106 @@ impl Enemy {
             thread::sleep(time::Duration::from_millis(600));
         }
     }
+    pub fn load_t1() -> Vec<Enemy>{
+        vec!(
+            Enemy {
+                name: "Rat",
+                health: 8,
+                dmg_phys: 1,
+                dmg_magic: 0,
+                armor: 0,
+                magic_res: 0,
+                speed: 2,
+                crit: 3,
+                tier: 1,
+                atk_txt: "claws",
+                entry_txt: "A rat scurries up from the darkness, it has become large and fat from chewing on the limbs of your ancestors \n"
+            },
+            Enemy {
+                name: "Axeman",
+                health: 12,
+                dmg_phys: 2,
+                dmg_magic: 0,
+                armor: 0,
+                magic_res: 0,
+                speed: 3,
+                crit: 5,
+                tier: 1,
+                atk_txt: "hacks",
+                entry_txt: "A burly man with an axe stands between you and the exit. He looks determained to fell you \n"
+            },
+            Enemy {
+                name: "Rock Worm",
+                health: 10,
+                dmg_phys: 1,
+                dmg_magic: 0,
+                armor: 1,
+                magic_res: 1,
+                speed: 3,
+                crit: 3,
+                tier: 1,
+                atk_txt: "headbutts",
+                entry_txt: "It's hard to see anything in this room, but you hear a low scraping sound as what appears to be a rock inches towards you \n"
+            },
+            Enemy {
+                name: "Thief",
+                health: 7,
+                dmg_phys: 1,
+                dmg_magic: 0,
+                armor: 0,
+                magic_res: 0,
+                speed: 1,
+                crit: 4,
+                tier: 1,
+                atk_txt: "stabs",
+                entry_txt: "A cloaked head turns as you enter. Shocked by your pressence the shrouded figure faces you.  \n"
+            }
+        )
+    }
+    pub fn load_t2() -> Vec<Enemy>{
+        vec!(
+            Enemy {
+                name: "Sentry Golem",
+                health: 18,
+                dmg_phys: 3,
+                dmg_magic: 0,
+                armor: 3,
+                magic_res: 1,
+                speed: 3,
+                crit: 3,
+                tier: 2,
+                atk_txt: "smashes",
+                entry_txt: "With thundering steps a golem charges towards you, the defence system must be on high alert \n"
+            },
+            Enemy {
+                name: "Necromancer",
+                health: 15,
+                dmg_phys: 0,
+                dmg_magic: 3,
+                armor: 0,
+                magic_res: 3,
+                speed: 2,
+                crit: 3,
+                tier: 2,
+                atk_txt: "hurls decay at",
+                entry_txt: "You spot a twisted old man rotting away the life within the sanctuary, he must be stopped \n"
+            },
+            Enemy {
+                name: "Mercenary",
+                health: 16,
+                dmg_phys: 2,
+                dmg_magic: 0,
+                armor: 1,
+                magic_res: 1,
+                speed: 1,
+                crit: 10,
+                tier: 2,
+                atk_txt: "slashes",
+                entry_txt: "A well armed man stalks the halls, He seems to be looking to kill anything that moves \n"
+            },
+    
+        )
+    }
 }
-pub fn load_t1() -> Vec<Enemy>{
-    vec!(
-        Enemy {
-            name: "Rat",
-            health: 8,
-            dmg_phys: 1,
-            dmg_magic: 0,
-            armor: 0,
-            magic_res: 0,
-            speed: 2,
-            crit: 3,
-            tier: 1,
-            atk_txt: "claws",
-            entry_txt: "A rat scurries up from the darkness, it has become large and fat from chewing on the limbs of your ancestors \n"
-        },
-        Enemy {
-            name: "Axeman",
-            health: 12,
-            dmg_phys: 2,
-            dmg_magic: 0,
-            armor: 0,
-            magic_res: 0,
-            speed: 3,
-            crit: 5,
-            tier: 1,
-            atk_txt: "hacks",
-            entry_txt: "A burly man with an axe stands between you and the exit. He looks determained to fell you \n"
-        },
-        Enemy {
-            name: "Rock Worm",
-            health: 10,
-            dmg_phys: 1,
-            dmg_magic: 0,
-            armor: 1,
-            magic_res: 1,
-            speed: 3,
-            crit: 3,
-            tier: 1,
-            atk_txt: "headbutts",
-            entry_txt: "It's hard to see anything in this room, but you hear a low scraping sound as what appears to be a rock inches towards you \n"
-        },
-        Enemy {
-            name: "Thief",
-            health: 7,
-            dmg_phys: 1,
-            dmg_magic: 0,
-            armor: 0,
-            magic_res: 0,
-            speed: 1,
-            crit: 4,
-            tier: 1,
-            atk_txt: "stabs",
-            entry_txt: "A cloaked head turns as you enter. Shocked by your pressence the shrouded figure faces you.  \n"
-        }
-    )
-}
+
+

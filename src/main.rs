@@ -3,6 +3,8 @@ use rand::prelude::*;
 pub mod items;
 pub mod players;
 pub mod enemys;
+pub mod floors;
+use floors::Floor;
 use enemys::Enemy;
 use players::Player;
 // use std::{thread, time};
@@ -43,7 +45,7 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
             Some("help") => println!("available commands: attack, cast <spell/buff name>, stats, inv"),
 
             None => println!("unknown command type 'help' for availible commands"),
-            _ => println!("unknown command type 'help' for availible commands"),
+            _ => println!("unknown command, type 'help' for availible commands"),
         }
     }
     println!("The {} is defeated!", enemy.name);
@@ -72,19 +74,29 @@ fn main() {
     println!("Welcome, at any point you can enter 'help' to get information on commands");
     player.level_up(3, 0, true);
 
-    println!("
-    With a snap dust fills the air and your feet hit the floor. 
-    Your eyes are open for the first time. 
-    A doorway is wide open across the room from you. 
-    You are compelled to go through... \n");
-
+    let mut floor = Floor::new(1);
+    floor.print_entry_txt();
     loop {
-        let t1_enemys = enemys::load_t1();
-        let mut enemy = t1_enemys[player.gen.gen_range(0, t1_enemys.len())];
-        if !combat(&mut player, &mut enemy) {
-            println!("You have died");
-            break;
-        } 
+        match floor.rooms.pop() {
+           Some(1) => {
+                let mut enemy = floor.enemys[player.gen.gen_range(0, floor.enemys.len())];
+                if !combat(&mut player, &mut enemy) {
+                    println!("You have died");
+                    break;
+                } 
+            },
+            Some(2) => {
+                let item = floor.spells[player.gen.gen_range(0, floor.spells.len())].clone();
+                println!("It's an item room, you got {}", item.name);
+                player.spells.push(item);
+            },
+            None => {
+                println!("its time to fight a boss and switch floors");
+                combat(&mut player, &mut floor.boss);
+                break;
+            },
+            _ => panic!("Something has gone horribly wrong")
+        }
     }
 }
 
