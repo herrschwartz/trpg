@@ -19,19 +19,22 @@ pub struct Enemy {
 }
 
 impl Enemy {
-    pub fn attack(&mut self, num_atks_enemy: i32, player: &mut Player) {
+    pub fn attack(&mut self, speed_of_action: i32, player: &mut Player) {
+        let mut num_atks_enemy: i32 = speed_of_action / self.speed;
+        if num_atks_enemy < 1 {num_atks_enemy = 1}
+
         for _ in 0.. num_atks_enemy {
-            let mut dmg_amt = self.dmg_phys + player.gen.gen_range(0, self.tier + 1) - player.armor.value;
-            let dmg_magic = self.dmg_magic - player.armor.magic_res;
+            let mut dmg_amt = self.dmg_phys + player.gen.gen_range(0, self.tier + 1) - player.armor;
+            let dmg_magic = self.dmg_magic - player.armor_magic;
             if dmg_magic > 0 {dmg_amt += dmg_magic}
             if dmg_amt < 0 {dmg_amt = 0}
 
             if self.crit >= player.gen.gen_range(1, 101) {
                 player.health -= dmg_amt * 2;
-                println!("The {} crits you for {} damage! ow \nYou have {} health", self.name, dmg_amt * 2, player.health)
+                println!("The {} Crits you for {} damage!! \n", self.name, dmg_amt * 2)
             } else {
                 player.health -= dmg_amt;
-                println!("The {} {} you for {} damage \nYou have {} health", self.name, self.atk_txt, dmg_amt, player.health)
+                println!("The {} {} you for {} damage \n", self.name, self.atk_txt, dmg_amt)
             }
             thread::sleep(time::Duration::from_millis(600));
         }
@@ -97,9 +100,9 @@ impl Enemy {
             Enemy {
                 name: "Sentry Golem",
                 health: 18,
-                dmg_phys: 3,
+                dmg_phys: 2,
                 dmg_magic: 0,
-                armor: 3,
+                armor: 4,
                 magic_res: 1,
                 speed: 3,
                 crit: 3,
@@ -117,7 +120,7 @@ impl Enemy {
                 speed: 2,
                 crit: 3,
                 tier: 2,
-                atk_txt: "hurls decay at",
+                atk_txt: "unleashes decay at",
                 entry_txt: "You spot a twisted old man rotting away the life within the sanctuary, he must be stopped \n"
             },
             Enemy {
@@ -133,7 +136,32 @@ impl Enemy {
                 atk_txt: "slashes",
                 entry_txt: "A well armed man stalks the halls, He seems to be looking to kill anything that moves \n"
             },
-    
+            Enemy {
+                name: "Corrupted Vines",
+                health: 14,
+                dmg_phys: 2,
+                dmg_magic: 0,
+                armor: 2,
+                magic_res: 2,
+                speed: 2,
+                crit: 5,
+                tier: 2,
+                atk_txt: "constrict",
+                entry_txt: "Your foot is suddenly caught as you walk, the roots themselves have been turned against you \n"
+            },
+            Enemy {
+                name: "Acolyte",
+                health: 16,
+                dmg_phys: 2,
+                dmg_magic: 2,
+                armor: 2,
+                magic_res: 1,
+                speed: 2,
+                crit: 5,
+                tier: 2,
+                atk_txt: "constrict",
+                entry_txt: "A women dressed in black and purple robes seemingly comes from nowhere to block you path. She draws a glowing dagger and smiles wickedly  \n"
+            },
         )
     }
 }

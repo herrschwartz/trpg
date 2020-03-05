@@ -25,7 +25,36 @@ impl Floor {
                 boss: Enemy{
                     name: "Foreman",
                     health: 20,
-                    dmg_phys: 3,
+                    dmg_phys: 2,
+                    dmg_magic: 0,
+                    armor: 1,
+                    magic_res: 1,
+                    speed: 2,
+                    crit: 3,
+                    tier: 2,
+                    atk_txt: "hammers",
+                    entry_txt: "
+                The labrinth of rooms ends here and opens up into a great hall.
+                A battering ram has penetrated the door that seals the vault.
+                The foreman stands in front of the drill, reading a piece of paper.
+                He looks up at you and sneers. 
+                \"You really think you can stop this operation?\" \n"
+                },
+                rooms
+            }
+        } else if floor_number == 2 {
+            let enemys = Enemy::load_t2();
+            let spells = Spell::load_t1_spells();
+            let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2];
+            rooms.shuffle(&mut rng);
+            return Floor {
+                floor_number,
+                enemys,
+                spells,
+                boss: Enemy {
+                    name: "Foreman",
+                    health: 20,
+                    dmg_phys: 2,
                     dmg_magic: 0,
                     armor: 1,
                     magic_res: 1,
@@ -38,7 +67,7 @@ impl Floor {
                 A battering ram has penetrated the door that seals the vault.
                 The foreman stands in front of the drill, reading a piece of paper.
                 He looks up at you and sneers. 
-                \"You think you can stop this operation? Fool!\" \n"
+                \"You really think you can stop this operation?\" \n"
                 },
                 rooms
             }
@@ -48,7 +77,7 @@ impl Floor {
             enemys: vec![],
             spells: vec![],
             boss: Enemy {
-                name: "Rat",
+                name: "Error",
                 health: 8,
                 dmg_phys: 1,
                 dmg_magic: 0,
@@ -70,13 +99,13 @@ impl Floor {
     With a snap dust fills the air and your feet hit the floor. 
     Your eyes are open for the first time. 
     Roots line the path in front of you.
-    A doorway is wide open across the room from you. 
+    The two heavy wooden doors in front of you swing wide open. 
     You are compelled to go through... \n"),
             2 =>
     println!("
-    You crawl through the breath into the vault,
+    You crawl through the breach into the vault,
     The air is dry inside.
-    Great walls of stone joined at perpendicular angles surroung you.
+    Great walls of stone joined at perpendicular angles surround you.
     There is an obvious path set out before where the intruders have smashed throught the vault doors...
     \n"),
     _ => panic!("Your in limbo, something fucked up")

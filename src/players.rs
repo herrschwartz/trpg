@@ -1,5 +1,4 @@
 use crate::items::Weapon;
-use crate::items::Armor;
 use crate:: items::Spell;
 use crate::enemys::Enemy;
 use crate::LEVELS;
@@ -11,11 +10,14 @@ use std::{thread, time};
 pub struct Player {
     pub health: i32,
     pub max_health: i32,
+    pub armor: i32,
+    pub armor_magic: i32,
+    pub lifeforce: i32,
     pub exp: i32,
     pub level: i32,
     pub weapon: Weapon,
-    pub armor: Armor,
     pub spells: Vec<Spell>,
+    pub weapons: Vec<Weapon>,
 
     pub strength: i32,
     pub int: i32,
@@ -27,17 +29,20 @@ pub struct Player {
 
 impl Player {
     pub fn new() -> Player {
-        let mut rng = thread_rng();
+        let rng = thread_rng();
         Player {
             health: 10,
             max_health: 10,
             exp: 0,
             level: 1,
-            weapon: Weapon {name: "Fists", damage: 0, speed: 1, crit: 2, atk_txt: "punch", crit_txt: "smash", rank: 0},
-            armor: Armor {name: "Cloth Tunic", value: 0, magic_res: 0, rank: 0},
+            lifeforce: 0,
+            weapon: Weapon {name: "Fists", damage: 0, speed: 1, crit: 1, atk_txt: "punch", crit_txt: "smash", rank: 0},
+            armor: 0,
+            armor_magic: 0,
             spells: vec![Spell{name: "arcane bolt", description: "A basic bolt of magic energy", 
                         speed: 1, damage: 2, kind: "arcane",
                         atk_txt: "Your hands fume with perverse energies, they coalese into a dense bead"}],
+            weapons: vec![],
             strength: 3,
             int: 3,
             resolve: 2,
@@ -45,11 +50,18 @@ impl Player {
             gen: rng
         }
     }
+
+    pub fn heal(&mut self, amount: i32) {
+        self.health += amount;
+        if self.health > self.max_health {
+            self.health = self.max_health
+        }
+        println!("You heal for {}", amount);
+    }
+
     pub fn attack(&mut self, target: &mut Enemy) {
         let mut num_atks: i32 = target.speed / self.weapon.speed;
         if num_atks < 1 { num_atks = 1 };
-        let mut num_atks_enemy: i32 = self.weapon.speed / target.speed;
-        if num_atks_enemy < 1 {num_atks_enemy = 1}
 
         //Player attacks
         for _ in 0..num_atks {
@@ -57,21 +69,21 @@ impl Player {
 
             if self.weapon.crit >= self.gen.gen_range(1, 101) {
                 target.health -= dmg_amt * 2;
-                println!("you {} the {} with your {} for {} damage!", self.weapon.crit_txt, target.name, self.weapon.name, dmg_amt * 2);
+                println!("you {} the {} with your {} for {} damage!!", self.weapon.crit_txt, target.name, self.weapon.name, dmg_amt * 2);
             } else {
                 target.health -= dmg_amt;
                 println!("you {} the {} with your {} for {} damage", self.weapon.atk_txt, target.name, self.weapon.name, dmg_amt);
             }
             thread::sleep(time::Duration::from_millis(600));
         }
-        println!("");
+        println!();
         if target.health <= 0 {
             return 
         }
 
         //enemy retaliation
         thread::sleep(time::Duration::from_millis(600));
-        target.attack(num_atks_enemy, self);
+        target.attack(self.weapon.speed, self);
     }
 
     pub fn cast_spell(&mut self, target: &mut Enemy, spell_name: String) {
@@ -92,12 +104,12 @@ impl Player {
                 target.health -= dmg;
                 println!("{} and you hit the {} for {}", spell.atk_txt, target.name, dmg);
 
-                println!("");
+                println!();
                 if target.health <= 0 {
                     return 
                 }
                 //enemy attacks back
-                target.attack(num_atks_enemy, self);
+                target.attack(spell.speed, self);
 
                 //remove used spell from inventory
                 self.spells.remove(spell_pos);
@@ -105,8 +117,11 @@ impl Player {
             None => println!("You don't have {}", spell_name)
         }
     }
-    
 
+    pub fn invoke(&mut self, target: &mut Enemy, spell_name: String, in_combat: bool) {
+        
+    }
+    
     pub fn display_stats(&self) {
         println!("
         Level     {} \n
@@ -121,7 +136,7 @@ impl Player {
     }
 
     pub fn level_up(&mut self, mut choice: i32, random: i32, is_special: bool) {
-        //Special circumstances include start of game stats and items, otherwise level normally
+        //Special circumstances include start of game, and items. otherwise level normally
         if !is_special {
             self.level += 1;
             self.max_health += 5;
@@ -156,7 +171,7 @@ impl Player {
                 Some("help") => println!("To improve a stat type the name of the stat and press enter.
                 Strength - increases damage done by phsycial attacks
                 Intellect - increases damage done by spells
-                Devotion - increase your chance of getting spells and boons
+                Devotion - increase your chance of getting spells and blessings
                 Resolve - you heal by your resolve amount at the end of combat, some enemies or items may test your resolve"),
 
                 None => {println!("Please type either strength, intellect, devotion or resolove")},
@@ -166,13 +181,35 @@ impl Player {
     }
 
     pub fn display_inventory(&self) {
+        println!("\nLifeforce: {}", self.lifeforce);
         println!("--------- equipped ---------");
         println!("Weapon: {} - dmg {} spd {} crit {}%", self.weapon.name, self.weapon.damage, self.weapon.speed, self.weapon.crit);
-        println!("Armor: {} - armor {} magic {}", self.armor.name, self.armor.value, self.armor.magic_res);
+        println!("Armor: Physical {} magic {}", self.armor, self.armor_magic);
         println!("---------------------------- \n");
         for s in &self.spells {
             println!("{} - {}", s.name, s.description);
-            println!("-");
         }
+        for t in &self.weapons {
+            println!("{} - dmg {} spd {} crit {}%", t.name, t.damage, t.speed, t.crit);
+        }
+        println!();
+    }
+
+    pub fn equip(&mut self, weapon_name: String) {
+        let weapon = self.weapons.iter().position(|x| x.name.to_lowercase() == weapon_name);
+        match weapon {
+            Some(weapon) => {
+                self.weapons.push(self.weapon.clone());
+                self.weapon = self.weapons[weapon].clone();
+                self.weapons.remove(weapon);
+            }
+            None => println!("You don't have a weapon in your inventory named {}", weapon_name)
+        }
+    }
+}
+
+impl Default for Player {
+    fn default() -> Self {
+        Self::new()
     }
 }
