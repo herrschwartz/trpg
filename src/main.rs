@@ -8,6 +8,7 @@ use floors::Floor;
 use enemys::Enemy;
 use players::Player;
 use std::{thread, time};
+use items::remove_effect;
 
 static LEVELS: [i32; 12] = [5, 10, 20, 40, 80, 150, 200, 250, 400, 600, 800, 1000];
 
@@ -25,6 +26,7 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
     println!(" {:-<15}+", "+");
     println!(" {:^15}", "Combat");
     println!(" {:-<15}+\n", "+");
+    let mut active_effects: Vec<&'static str> = Vec::new();
     while enemy.health > 0 {
         if player.health <= 0 {
             return false;
@@ -40,9 +42,15 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
             Some("cast") => player.cast_spell(&mut enemy, commands.map(|x| x.to_string())
                                                                             .collect::<Vec<String>>()
                                                                             .join(" ")),
+            Some("invoke") => {
+            match player.invoke(&mut enemy, commands.map(|x| x.to_string()).collect::<Vec<String>>().join(" "), true) {
+                    Some(b) => active_effects.push(b),
+                    None => (),
+                }
+            },                                                                
             Some("stats") => player.display_stats(),
             Some("inv") => player.display_inventory(),
-            Some("help") => println!("available commands: attack, cast <spell/buff name>, stats, inv"),
+            Some("help") => println!("available commands: attack, cast 'spell name', invoke 'blessing name', stats, inv"),
 
             None => println!("unknown command type 'help' for availible commands"),
             _ => println!("unknown command, type 'help' for availible commands"),
@@ -50,10 +58,16 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
     }
     thread::sleep(time::Duration::from_millis(600));
     println!("The {} is defeated!", enemy.name);
-    //combat victory end phase
+
+    // ---- combat victory end phase ----
     //restore health
     player.heal(player.resolve);
     thread::sleep(time::Duration::from_millis(600));
+
+    //remove active effects
+    for e in active_effects {
+        remove_effect(player, e);
+    }
 
     let lf = enemy.tier * 10 - player.gen.gen_range(0, (enemy.tier * 10) / 2 + 1);
     println!("You absorb {} lifeforce from your enemy", lf);
@@ -122,7 +136,7 @@ fn rest(player: &mut Player) {
             Some("invoke") => println!("If you had a somthing to invoke we would"),     
             Some("stats") => player.display_stats(),
             Some("inv") => player.display_inventory(),
-            Some("help") => println!("available commands: next (next room), invoke <buff name>, equip, stats, inv"),
+            Some("help") => println!("available commands: next (next room), invoke 'blessing name', equip 'weapon name', stats, inv"),
 
             None => println!("unknown command type 'help' for availible commands"),
             _ => println!("unknown command, type 'help' for availible commands"),

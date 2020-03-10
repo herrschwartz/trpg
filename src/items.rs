@@ -1,6 +1,7 @@
 use crate::players::Player;
 use crate::enemys::Enemy;
 
+#[derive(Clone)]
 pub struct Blessing {
     pub name: &'static str,
     pub description: &'static str,
@@ -39,7 +40,7 @@ impl Spell {
     pub fn load_t1_spells() -> Vec<Spell> {
         vec!{
             Spell {
-                name: "arcane bolt", 
+                name: "Arcane Bolt", 
                 description: "A basic bolt of magic energy", 
                 speed: 1, 
                 damage: 2, 
@@ -47,7 +48,7 @@ impl Spell {
                 atk_txt: "Your hands fume with perverse energies, they coalese into a dense bead"
             },
             Spell {
-                name: "fire ball", 
+                name: "Fire Ball", 
                 description: "A normal fireball", 
                 speed: 1, 
                 damage: 6, 
@@ -55,7 +56,7 @@ impl Spell {
                 atk_txt: "Your hands glow and a small ball of bright heat forms"
             },
             Spell {
-                name: "fire blast", 
+                name: "Fire Blast", 
                 description: "Slower to cast than a fireball, but sure to get the job done", 
                 speed: 2, 
                 damage: 9, 
@@ -63,7 +64,7 @@ impl Spell {
                 atk_txt: "You channel all of your strength into your hands. Releasing the fire within"
             },
             Spell {
-                name: "static shock", 
+                name: "Static Shock", 
                 description: "A shock maybe enough to stop a heart", 
                 speed: 1, 
                 damage: 0, 
@@ -87,9 +88,9 @@ impl Weapon {
         vec![
             Weapon {
                 name: "Dagger",
-                damage: 0,
+                damage: 1,
                 speed: 1,
-                crit: 7,
+                crit: 4,
                 rank: 1,
                 crit_txt: "eviscerate",
                 atk_txt: "stab",
@@ -104,10 +105,19 @@ impl Weapon {
                 atk_txt: "cut",
             },
             Weapon {
+                name: "Spiked Mace",
+                damage: 1,
+                speed: 2,
+                crit: 8,
+                rank: 1,
+                crit_txt: "imaple",
+                atk_txt: "cut",
+            },
+            Weapon {
                 name: "Claymore",
                 damage: 5,
                 speed: 3,
-                crit: 4,
+                crit: 3,
                 rank: 1,
                 crit_txt: "destroy",
                 atk_txt: "slash",
@@ -126,14 +136,13 @@ impl Blessing {
                 enemy.health -= 4;
                 player.heal(2);
                 println!("The burst of holy energy hits the {} for 4 damage", enemy.name);
+            },
+            "Protection" => {
+                player.armor += 1;
+                player.armor_magic += 1;
+                println!("Your armor and magic resistance increase!");
             }
-            _ => println!("No cast effect for {}", self.name)
-        }
-    }
-    pub fn remove_effect(&self, player: &mut Player) {
-        match self.name {
-            "Holy Strength" => player.strength -= 1,
-            _ => ()
+            _ => panic!("No cast effect for {}", self.name)
         }
     }
     pub fn loat_t1_blessings() -> Vec<Blessing> {
@@ -177,7 +186,26 @@ impl Blessing {
                 retaliation: true,
                 combat_only: true,
                 invoke_txt: "You reach your hand to the sky pulling holy energy into your body. Pushing your hands foward you unleash it upon your enemy."
+            },
+            Blessing {
+                name: "Protection",
+                description: "Shrounds you in holy energy, increasing your armor",
+                speed: 1,
+                retaliation: true,
+                combat_only: true,
+                invoke_txt: "You pull the surrounding energy into yourself, shielding you from evil."
             }
         ]
+    }
+}
+
+pub fn remove_effect(player: &mut Player, blessing_name: &'static str) {
+    match blessing_name {
+        "Holy Strength" => player.strength -= 1,
+        "Protection" => {
+            player.armor -= 1;
+            player.armor_magic -= 1;
+        }
+        _ => panic!("Failed to remove {}", blessing_name)
     }
 }

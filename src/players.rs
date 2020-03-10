@@ -1,5 +1,5 @@
 use crate::items::Weapon;
-use crate:: items::Spell;
+use crate:: items::{Spell, Blessing};
 use crate::enemys::Enemy;
 use crate::LEVELS;
 use rand::prelude::*;
@@ -18,6 +18,7 @@ pub struct Player {
     pub weapon: Weapon,
     pub spells: Vec<Spell>,
     pub weapons: Vec<Weapon>,
+    pub blessings: Vec<Blessing>,
 
     pub strength: i32,
     pub int: i32,
@@ -43,6 +44,14 @@ impl Player {
                         speed: 1, damage: 2, kind: "arcane",
                         atk_txt: "Your hands fume with perverse energies, they coalese into a dense bead"}],
             weapons: vec![],
+            blessings: vec![            Blessing {
+                name: "Holy Strength",
+                description: "Increases your strength slightly for this combat",
+                speed: 1,
+                retaliation: false,
+                combat_only: true,
+                invoke_txt: "You kneel and speak a word of power, your strength increases"
+            },],
             strength: 3,
             int: 3,
             resolve: 2,
@@ -65,7 +74,8 @@ impl Player {
 
         //Player attacks
         for _ in 0..num_atks {
-            let dmg_amt = self.weapon.damage + self.gen.gen_range(1, self.strength) - target.armor;
+            let mut dmg_amt = self.weapon.damage + self.gen.gen_range(1, self.strength) - target.armor;
+            if dmg_amt < 0 {dmg_amt = 0}
 
             if self.weapon.crit >= self.gen.gen_range(1, 101) {
                 target.health -= dmg_amt * 2;
@@ -87,12 +97,10 @@ impl Player {
     }
 
     pub fn cast_spell(&mut self, target: &mut Enemy, spell_name: String) {
-        let spell_pos = self.spells.iter().position(|x| x.name == spell_name); 
+        let spell_pos = self.spells.iter().position(|x| x.name.to_lowercase() == spell_name); 
         match spell_pos {
             Some(spell_pos) => {
                 let spell = &self.spells[spell_pos];
-                let mut num_atks_enemy: i32 = spell.speed / target.speed;
-                if num_atks_enemy < 1 {num_atks_enemy = 1}
 
                 let mut dmg = match spell.kind {
                     "arcane"    => spell.damage + self.int - target.magic_res,
@@ -114,12 +122,32 @@ impl Player {
                 //remove used spell from inventory
                 self.spells.remove(spell_pos);
             },
-            None => println!("You don't have {}", spell_name)
+            None => println!("You don't have a spell named {}", spell_name)
         }
     }
 
-    pub fn invoke(&mut self, target: &mut Enemy, spell_name: String, in_combat: bool) {
-        
+    pub fn invoke(&mut self, target: &mut Enemy, spell_name: String, in_combat: bool) -> Option<&'static str> {
+        let blessing_pos = self.blessings.iter().position(|x| x.name.to_lowercase() == spell_name);
+        match blessing_pos {
+            Some(blessing_pos) => {
+                let blessing = self.blessings[blessing_pos].clone();
+
+                if blessing.combat_only == true && in_combat == false {
+                    println!("You can only use {} in combat", spell_name);
+                    return None;
+                }
+
+                println!("{}", blessing.invoke_txt);
+                blessing.invoke_effect(self, target);
+
+                self.blessings.remove(blessing_pos);
+                return Some(blessing.name);
+            },
+            None => {
+                println!("You don't have a blessing named {}", spell_name);
+                return None;
+            }
+        }
     }
     
     pub fn display_stats(&self) {
@@ -188,6 +216,9 @@ impl Player {
         println!("---------------------------- \n");
         for s in &self.spells {
             println!("{} - {}", s.name, s.description);
+        }
+        for b in &self.blessings {
+            println!("{} - {}", b.name, b.description);
         }
         for t in &self.weapons {
             println!("{} - dmg {} spd {} crit {}%", t.name, t.damage, t.speed, t.crit);
