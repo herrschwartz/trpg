@@ -39,6 +39,11 @@ impl Enemy {
             thread::sleep(time::Duration::from_millis(600));
         }
     }
+    pub fn new() -> Enemy {
+        Enemy{name: "placeholder",health: 1,dmg_phys: 1,dmg_magic: 1,armor: 1
+        ,magic_res: 1,speed: 1,crit: 1,tier: 1,atk_txt: "",entry_txt: ""}
+    }
+
     pub fn load_t1() -> Vec<Enemy>{
         vec!(
             Enemy {
@@ -152,7 +157,7 @@ impl Enemy {
             Enemy {
                 name: "Acolyte",
                 health: 16,
-                dmg_phys: 2,
+                dmg_phys: 1,
                 dmg_magic: 2,
                 armor: 2,
                 magic_res: 1,

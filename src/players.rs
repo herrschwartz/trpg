@@ -1,5 +1,4 @@
-use crate::items::Weapon;
-use crate:: items::{Spell, Blessing};
+use crate::items::{Spell, Blessing, Weapon};
 use crate::enemys::Enemy;
 use crate::LEVELS;
 use rand::prelude::*;
@@ -44,14 +43,9 @@ impl Player {
                         speed: 1, damage: 2, kind: "arcane",
                         atk_txt: "Your hands fume with perverse energies, they coalese into a dense bead"}],
             weapons: vec![],
-            blessings: vec![            Blessing {
-                name: "Holy Strength",
-                description: "Increases your strength slightly for this combat",
-                speed: 1,
-                retaliation: false,
-                combat_only: true,
-                invoke_txt: "You kneel and speak a word of power, your strength increases"
-            },],
+            blessings: vec![Blessing {name: "Heal",description: "A basic heal that scales with devotion",
+                            speed: 1, retaliation: true, combat_only: false, active_effect: false,
+                            invoke_txt: "You bask in holy light, restoring your vitality"}],
             strength: 3,
             int: 3,
             resolve: 2,
@@ -69,8 +63,7 @@ impl Player {
     }
 
     pub fn attack(&mut self, target: &mut Enemy) {
-        let mut num_atks: i32 = target.speed / self.weapon.speed;
-        if num_atks < 1 { num_atks = 1 };
+        let num_atks: i32 = (target.speed as f64 / self.weapon.speed as f64).ceil() as i32;
 
         //Player attacks
         for _ in 0..num_atks {
@@ -126,26 +119,53 @@ impl Player {
         }
     }
 
-    pub fn invoke(&mut self, target: &mut Enemy, spell_name: String, in_combat: bool) -> Option<&'static str> {
+    pub fn invoke_combat(&mut self, target: &mut Enemy, spell_name: String) -> Option<&'static str> {
         let blessing_pos = self.blessings.iter().position(|x| x.name.to_lowercase() == spell_name);
         match blessing_pos {
             Some(blessing_pos) => {
                 let blessing = self.blessings[blessing_pos].clone();
 
-                if blessing.combat_only == true && in_combat == false {
-                    println!("You can only use {} in combat", spell_name);
-                    return None;
-                }
-
                 println!("{}", blessing.invoke_txt);
                 blessing.invoke_effect(self, target);
 
+                if blessing.retaliation {
+                    target.attack(blessing.speed, self);
+                }
+
                 self.blessings.remove(blessing_pos);
-                return Some(blessing.name);
+                if blessing.active_effect {
+                    return Some(blessing.name);
+                }
+                None
             },
             None => {
                 println!("You don't have a blessing named {}", spell_name);
                 return None;
+            }
+        }
+    }
+
+    pub fn invoke_non_combat(&mut self, spell_name: String) {
+        let blessing_pos = self.blessings.iter().position(|x| x.name.to_lowercase() == spell_name);
+        match blessing_pos {
+            Some(blessing_pos) => {
+                let blessing = self.blessings[blessing_pos].clone();
+
+                if blessing.combat_only == true {
+                    println!("You can only use {} in combat", spell_name);
+                    return;
+                }
+
+                println!("{}", blessing.invoke_txt);
+
+                //this is ugly design. I hate it
+                let mut target = Enemy::new();
+                blessing.invoke_effect(self, &mut target);
+
+                self.blessings.remove(blessing_pos);
+            },
+            None => {
+                println!("You don't have a blessing named {}", spell_name);
             }
         }
     }
@@ -233,6 +253,7 @@ impl Player {
                 self.weapons.push(self.weapon.clone());
                 self.weapon = self.weapons[weapon].clone();
                 self.weapons.remove(weapon);
+                println!("{} has been equiped", weapon_name);
             }
             None => println!("You don't have a weapon in your inventory named {}", weapon_name)
         }

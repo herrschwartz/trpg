@@ -8,6 +8,7 @@ pub struct Blessing {
     pub speed: i32,
     pub retaliation: bool,
     pub combat_only: bool,
+    pub active_effect: bool,
 
     pub invoke_txt: &'static str,
 }
@@ -51,7 +52,7 @@ impl Spell {
                 name: "Fire Ball", 
                 description: "A normal fireball", 
                 speed: 1, 
-                damage: 6, 
+                damage: 5, 
                 kind: "fire",
                 atk_txt: "Your hands glow and a small ball of bright heat forms"
             },
@@ -81,6 +82,59 @@ impl Spell {
             },
         }
     }
+
+    pub fn load_t2_spells() -> Vec<Spell> {
+        vec!{
+            Spell {
+                name: "Arcane Bolt", 
+                description: "A basic bolt of magic energy", 
+                speed: 1, 
+                damage: 2, 
+                kind: "arcane",
+                atk_txt: "Your hands fume with perverse energies, they coalese into a dense bead"
+            },
+            Spell {
+                name: "Arcane Missle", 
+                description: "A basic bolt of magic energy", 
+                speed: 1, 
+                damage: 4, 
+                kind: "arcane",
+                atk_txt: "Your hands fume with perverse energies, they coalese into a refined point"
+            },
+            Spell {
+                name: "Fire Blast", 
+                description: "Slower to cast than a fireball, but sure to get the job done", 
+                speed: 2, 
+                damage: 9, 
+                kind: "fire",
+                atk_txt: "You channel all of your strength into your hands. Releasing the fire within"
+            },
+            Spell {
+                name: "Fire Spear", 
+                description: "A quick and piercing fire spell", 
+                speed: 1, 
+                damage: 7, 
+                kind: "fire",
+                atk_txt: "You channel all of your strength into your hands. Releasing the fire within"
+            },
+            Spell {
+                name: "Thunder Bolt", 
+                description: "A bolt of dense plasma", 
+                speed: 1, 
+                damage: 2, 
+                kind: "lightning",
+                atk_txt: "You throw your arms forward, lightning follows and instantly hits your enemy."
+            },
+            Spell {
+                name: "Ball Lightning", 
+                description: "A dense packet of electricity, slow to cast", 
+                speed: 2, 
+                damage: 2, 
+                kind: "lightning",
+                atk_txt: "You cup both of your hands together, concetrating as much electric potention as you can between them"
+            },
+        }
+    }
 }
 
 impl Weapon {
@@ -99,7 +153,7 @@ impl Weapon {
                 name: "Longsword",
                 damage: 2,
                 speed: 2,
-                crit: 3,
+                crit: 5,
                 rank: 1,
                 crit_txt: "imaple",
                 atk_txt: "cut",
@@ -108,16 +162,16 @@ impl Weapon {
                 name: "Spiked Mace",
                 damage: 1,
                 speed: 2,
-                crit: 8,
+                crit: 15,
                 rank: 1,
-                crit_txt: "imaple",
-                atk_txt: "cut",
+                crit_txt: "bludgeon",
+                atk_txt: "bash",
             },
             Weapon {
                 name: "Claymore",
                 damage: 5,
                 speed: 3,
-                crit: 3,
+                crit: 4,
                 rank: 1,
                 crit_txt: "destroy",
                 atk_txt: "slash",
@@ -145,7 +199,7 @@ impl Blessing {
             _ => panic!("No cast effect for {}", self.name)
         }
     }
-    pub fn loat_t1_blessings() -> Vec<Blessing> {
+    pub fn load_t1_blessings() -> Vec<Blessing> {
         vec![
             Blessing {
                 name: "Heal",
@@ -153,6 +207,7 @@ impl Blessing {
                 speed: 1,
                 retaliation: true,
                 combat_only: false,
+                active_effect: false,
                 invoke_txt: "You bask in holy light, restoring your vitality"
             },
             Blessing {
@@ -161,6 +216,7 @@ impl Blessing {
                 speed: 1,
                 retaliation: true,
                 combat_only: false,
+                active_effect: false,
                 invoke_txt: "You bask in holy light, restoring your vitality"
             },
             Blessing {
@@ -169,6 +225,7 @@ impl Blessing {
                 speed: 1,
                 retaliation: false,
                 combat_only: true,
+                active_effect: true,
                 invoke_txt: "You kneel and speak a word of power, your strength increases"
             },
             Blessing {
@@ -177,6 +234,7 @@ impl Blessing {
                 speed: 1,
                 retaliation: false,
                 combat_only: true,
+                active_effect: false,
                 invoke_txt: "You clasp you hands together and conjure glowing shackles around your foe"
             },
             Blessing {
@@ -185,6 +243,7 @@ impl Blessing {
                 speed: 2,
                 retaliation: true,
                 combat_only: true,
+                active_effect: false,
                 invoke_txt: "You reach your hand to the sky pulling holy energy into your body. Pushing your hands foward you unleash it upon your enemy."
             },
             Blessing {
@@ -193,6 +252,7 @@ impl Blessing {
                 speed: 1,
                 retaliation: true,
                 combat_only: true,
+                active_effect: false,
                 invoke_txt: "You pull the surrounding energy into yourself, shielding you from evil."
             }
         ]

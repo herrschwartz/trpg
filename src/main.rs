@@ -12,15 +12,6 @@ use items::remove_effect;
 
 static LEVELS: [i32; 12] = [5, 10, 20, 40, 80, 150, 200, 250, 400, 600, 800, 1000];
 
-// fn get_input() -> Vec<String> {
-//     let mut input = String::new();
-//     stdin().read_line(&mut input).expect("Input Error");
-
-//     let cleaned = input.trim().to_lowercase();
-//     let mut commands: Vec<String> = cleaned.split_whitespace().map(|x| x.to_string()).collect();
-//     commands
-// }
-
 fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
     println!("{}", enemy.entry_txt);
     println!(" {:-<15}+", "+");
@@ -43,7 +34,7 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
                                                                             .collect::<Vec<String>>()
                                                                             .join(" ")),
             Some("invoke") => {
-            match player.invoke(&mut enemy, commands.map(|x| x.to_string()).collect::<Vec<String>>().join(" "), true) {
+            match player.invoke_combat(&mut enemy, commands.map(|x| x.to_string()).collect::<Vec<String>>().join(" ")) {
                     Some(b) => active_effects.push(b),
                     None => (),
                 }
@@ -101,9 +92,7 @@ fn main() {
             },
             //Item Room
             Some(2) => {
-                let item = floor.spells[player.gen.gen_range(0, floor.spells.len())].clone();
-                println!("It's an item room, you got {}", item.name);
-                player.spells.push(item);
+                floor.item_room(&mut player);
             },
             //Once all rooms are completed, boss time
             None => {
@@ -115,6 +104,15 @@ fn main() {
                 floor.print_entry_txt();
             },
             _ => panic!("Something has gone horribly wrong")
+        }
+        let spell_chance = ((player.devotion as f64).log2() * 10.0) as i32 + player.devotion;
+        if spell_chance >= player.gen.gen_range(1, 101) {
+            println!("\nYour devotion has paid off,\n    ...your favor grants you knowledge");
+            match player.gen.gen_range(0,2) {
+                0 => floor.get_random_blessing(&mut player, 1),
+                1 => floor.get_random_spell(&mut player, 1),
+                _ => panic!("Out of bounds for devotion chance")
+            }
         }
         rest(&mut player);
     }
@@ -130,13 +128,11 @@ fn rest(player: &mut Player) {
         let mut commands = cleaned.split_whitespace();
         match commands.next() {
             Some("next") => break,
-            Some("equip") => player.equip(commands.map(|x| x.to_string())
-                                                            .collect::<Vec<String>>()
-                                                            .join(" ")),
-            Some("invoke") => println!("If you had a somthing to invoke we would"),     
+            Some("equip") => player.equip(commands.map(|x| x.to_string()).collect::<Vec<String>>().join(" ")),
+            Some("invoke") => player.invoke_non_combat(commands.map(|x| x.to_string()).collect::<Vec<String>>().join(" ")),     
             Some("stats") => player.display_stats(),
             Some("inv") => player.display_inventory(),
-            Some("help") => println!("available commands: next (next room), invoke 'blessing name', equip 'weapon name', stats, inv"),
+            Some("help") => println!("available commands: next (advances to the next room), invoke 'blessing name', equip 'weapon name', stats, inv"),
 
             None => println!("unknown command type 'help' for availible commands"),
             _ => println!("unknown command, type 'help' for availible commands"),
