@@ -178,6 +178,14 @@ impl Floor {
         }
     }
 
+    pub fn shop(&self, player: &mut Player) {
+        println!("
+        Along the side of the hallways you notice a glowing alcove. 
+        This must be an ancient forge used by your ancestors.
+        The forge can strengthen your body or conjure magic and item from lifeforce.");
+        let for_sale = vec!["Armor upgrage", "Magic Armor upgrade"];
+    }
+
     pub fn print_entry_txt(&self) {
         match self.floor_number {
             1 => 
