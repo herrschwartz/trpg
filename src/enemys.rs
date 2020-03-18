@@ -20,7 +20,7 @@ pub struct Enemy {
 
 impl Enemy {
     pub fn attack(&mut self, speed_of_action: i32, player: &mut Player) {
-        let mut num_atks_enemy: i32 = speed_of_action / self.speed;
+        let mut num_atks_enemy:i32 = (speed_of_action as f32 / self.speed as f32).ceil() as i32;
         if num_atks_enemy < 1 {num_atks_enemy = 1}
 
         for _ in 0.. num_atks_enemy {
@@ -164,7 +164,7 @@ impl Enemy {
                 speed: 2,
                 crit: 5,
                 tier: 2,
-                atk_txt: "constrict",
+                atk_txt: "cuts",
                 entry_txt: "A women dressed in black and purple robes seemingly comes from nowhere to block you path. She draws a glowing dagger and smiles wickedly  \n"
             },
         )

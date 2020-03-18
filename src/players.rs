@@ -39,7 +39,7 @@ impl Player {
             weapon: Weapon {name: "Fists", damage: 0, speed: 1, crit: 1, atk_txt: "punch", crit_txt: "smash", rank: 0},
             armor: 0,
             armor_magic: 0,
-            spells: vec![Spell{name: "arcane bolt", description: "A basic bolt of magic energy", 
+            spells: vec![Spell{name: "Arcane Bolt", description: "A basic bolt of magic energy", 
                         speed: 1, damage: 2, kind: "arcane",
                         atk_txt: "Your hands fume with perverse energies, they coalese into a dense bead"}],
             weapons: vec![],
@@ -63,7 +63,7 @@ impl Player {
     }
 
     pub fn attack(&mut self, target: &mut Enemy) {
-        let num_atks: i32 = (target.speed as f64 / self.weapon.speed as f64).ceil() as i32;
+        let num_atks: i32 = (target.speed as f32 / self.weapon.speed as f32).ceil() as i32;
 
         //Player attacks
         for _ in 0..num_atks {

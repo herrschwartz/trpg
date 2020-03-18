@@ -94,6 +94,10 @@ fn main() {
             Some(2) => {
                 floor.item_room(&mut player);
             },
+            //Shop
+            Some(3) => {
+                floor.shop(&mut player);
+            }
             //Once all rooms are completed, boss time
             None => {
                 if !combat(&mut player, &mut floor.boss) {

@@ -102,6 +102,14 @@ impl Spell {
                 atk_txt: "Your hands fume with perverse energies, they coalese into a refined point"
             },
             Spell {
+                name: "Arcane Missle", 
+                description: "A basic bolt of magic energy", 
+                speed: 1, 
+                damage: 4, 
+                kind: "arcane",
+                atk_txt: "Your hands fume with perverse energies, they coalese into a refined point"
+            },
+            Spell {
                 name: "Fire Blast", 
                 description: "Slower to cast than a fireball, but sure to get the job done", 
                 speed: 2, 

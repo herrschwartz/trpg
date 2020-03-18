@@ -27,6 +27,7 @@ impl Floor {
             let weapons = Weapon::load_t1_weapons();
             let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 2];
             rooms.shuffle(&mut rng);
+            rooms.insert(rng.gen_range(0,2), 3);
             return Floor {
                 floor_number,
                 enemys,
@@ -58,7 +59,7 @@ impl Floor {
             let spells = Spell::load_t2_spells();
             let blessings = Blessing::load_t1_blessings(); //TODO: change when designing floor 2
             let weapons = Weapon::load_t1_weapons(); //TODO: See above
-            let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2];
+            let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2, 3];
             rooms.shuffle(&mut rng);
             return Floor {
                 floor_number,
@@ -71,12 +72,12 @@ impl Floor {
                     health: 40,
                     dmg_phys: 2,
                     dmg_magic: 0,
-                    armor: 1,
-                    magic_res: 1,
+                    armor: 5,
+                    magic_res: 0,
                     speed: 2,
                     crit: 3,
-                    tier: 1,
-                    atk_txt: "hammers",
+                    tier: 3,
+                    atk_txt: "slams",
                     entry_txt: "
                        FILL IN TEXT  \n"
                 },
@@ -182,8 +183,85 @@ impl Floor {
         println!("
         Along the side of the hallways you notice a glowing alcove. 
         This must be an ancient forge used by your ancestors.
-        The forge can strengthen your body or conjure magic and item from lifeforce.");
-        let for_sale = vec!["Armor upgrage", "Magic Armor upgrade"];
+        The forge can strengthen your body or conjure magic and item from lifeforce.\n");
+
+        let mut for_sale = vec![("Armor Upgrage", "upgrade", 16 * self.floor_number), ("Magic Armor Upgrade", "upgrade", 11 * self.floor_number)];
+
+        for _ in 0..player.gen.gen_range(4, 6) {  
+            match player.gen.gen_range(0,5) {
+                0 | 1 => for_sale.push((self.blessings[player.gen.gen_range(0, self.blessings.len())].name, "blessing", player.gen.gen_range(6,10) * self.floor_number)),
+                2 | 3 => for_sale.push((self.spells[player.gen.gen_range(0, self.spells.len())].name, "spell", player.gen.gen_range(6,10) * self.floor_number)),
+                4     => for_sale.push((self.weapons[player.gen.gen_range(0, self.weapons.len())].name, "weapon", player.gen.gen_range(12, 14) * self.floor_number)),
+                _     => panic!("Out of range random value")
+            }
+       }
+
+       println!("Lifeforce: {}", player.lifeforce);
+       for (i, item) in for_sale.iter().enumerate() {
+           println!("{}) {:<20} {:<3}", i+1, item.0, item.2)
+       }
+
+       loop {
+            let mut input = String::new();
+            stdin().read_line(&mut input).expect("Input Error");
+
+            let cleaned = input.trim().to_lowercase();
+            let mut commands = cleaned.split_whitespace();
+            let cmd = commands.next().unwrap_or_default();
+
+            match cmd {
+                "1" | "2" | "3" | "4" | "5" | "6" | "7" => {
+                    let n: usize = cmd.parse().unwrap();
+                    if n <= for_sale.len() {
+                        let buying = for_sale[n-1];
+                        if player.lifeforce < buying.2 {
+                            println!("Not enough lifeforce for {}", buying.0);
+                            continue;
+                        }
+                        match buying.1 {
+                            "upgrade" => {
+                                if buying.0 == "Armor Upgrage" {
+                                    player.armor += 1;
+                                    println!("Your armor increases by 1");
+                                } else {
+                                    player.armor_magic += 1;
+                                    println!("Your magic armor increases by 1");
+                                }
+                            }
+                            "blessing" => {
+                                player.blessings.push(self.blessings.iter().find(|x| x.name == buying.0).unwrap().clone());
+                                println!("You recieve {}", buying.0);
+                            }
+                            "spell" => {
+                                player.spells.push(self.spells.iter().find(|x| x.name == buying.0).unwrap().clone());
+                                println!("You recieve {}", buying.0);
+                            }
+                            "weapon" => {
+                                player.weapons.push(self.weapons.iter().find(|x| x.name == buying.0).unwrap().clone());
+                                println!("You recieve {}", buying.0);
+                            }
+                            _=> panic!("Invalid Shop item type")
+                        }
+                        player.lifeforce -= buying.2;
+                        for_sale.remove(n-1);
+                        println!("Lifeforce: {}", player.lifeforce);
+                        for (i, item) in for_sale.iter().enumerate() {
+                            println!("{}) {:<20} {:<3}", i+1, item.0, item.2)
+                        }
+                    }
+                }
+                "inv"    => player.display_inventory(),
+                "stats"  => player.display_stats(),
+                "leave"  => break,
+                "relist" => {
+                    for (i, item) in for_sale.iter().enumerate() {
+                        println!("{}) {:<20} {:<3}", i+1, item.0, item.2)
+                    }
+                },
+                "help"   => println!("Enter the number of the item that you wish to buy, type 'leave' to leave the shop.\n inv, stats, relist (relists shop items)"),
+                _ => println!("Invalid command {}, Enter the number of the item that you wish to buy, type 'leave' to leave the shop", cmd),
+            }
+       }
     }
 
     pub fn print_entry_txt(&self) {
