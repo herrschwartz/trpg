@@ -37,7 +37,7 @@ impl Floor {
                 boss: Enemy{
                     name: "Foreman",
                     health: 25,
-                    dmg_phys: 1,
+                    dmg_phys: 2,
                     dmg_magic: 0,
                     armor: 1,
                     magic_res: 1,
@@ -57,8 +57,8 @@ impl Floor {
         } else if floor_number == 2 {
             let enemys = Enemy::load_t2();
             let spells = Spell::load_t2_spells();
-            let blessings = Blessing::load_t1_blessings(); //TODO: change when designing floor 2
-            let weapons = Weapon::load_t1_weapons(); //TODO: See above
+            let blessings = Blessing::load_t2_blessings(); //TODO: change when designing floor 2
+            let weapons = Weapon::load_t2_weapons(); //TODO: See above
             let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2, 3];
             rooms.shuffle(&mut rng);
             return Floor {
@@ -69,8 +69,8 @@ impl Floor {
                 weapons,
                 boss: Enemy {
                     name: "Sanctum Guardian",
-                    health: 40,
-                    dmg_phys: 2,
+                    health: 42,
+                    dmg_phys: 3,
                     dmg_magic: 0,
                     armor: 5,
                     magic_res: 0,
@@ -79,7 +79,12 @@ impl Floor {
                     tier: 3,
                     atk_txt: "slams",
                     entry_txt: "
-                       FILL IN TEXT  \n"
+                       You make your way into the heart of the Sanctuary.
+                       walking into the expansive room you see the trunk of the great mother in the middle.
+                       The imposing  Guardian stands before it. A figure in all black with a placid mask stands on its shoulder.
+                       before you even get a chance to react the figure jumps down a dispears into a hollow in the trunk.
+                       The guardian activates
+                       ERADICATE. INTRUDERS. \n"
                 },
                 rooms
             }
@@ -174,7 +179,7 @@ impl Floor {
                 }
                 break;
             } else {
-                println!("There is no chest there named {}", input);
+                println!("There is no chest there named {} \n example: green chest", input);
             }
         }
     }
@@ -185,7 +190,7 @@ impl Floor {
         This must be an ancient forge used by your ancestors.
         The forge can strengthen your body or conjure magic and item from lifeforce.\n");
 
-        let mut for_sale = vec![("Armor Upgrage", "upgrade", 16 * self.floor_number), ("Magic Armor Upgrade", "upgrade", 11 * self.floor_number)];
+        let mut for_sale = vec![("Armor Upgrage", "upgrade", 48 + self.floor_number*2), ("Magic Armor Upgrade", "upgrade", 15 * self.floor_number)];
 
         for _ in 0..player.gen.gen_range(4, 6) {  
             match player.gen.gen_range(0,5) {

@@ -186,23 +186,81 @@ impl Weapon {
             }
         ]
     }
+    pub fn load_t2_weapons() -> Vec<Weapon> {
+        vec![
+            Weapon {
+                name: "Rapier",
+                damage: 1,
+                speed: 1,
+                crit: 8,
+                rank: 1,
+                crit_txt: "pierce",
+                atk_txt: "stab",
+            },
+            Weapon {
+                name: "Broadsword",
+                damage: 3,
+                speed: 2,
+                crit: 5,
+                rank: 1,
+                crit_txt: "imaple",
+                atk_txt: "cut",
+            },
+            Weapon {
+                name: "War Hammer",
+                damage: 2,
+                speed: 2,
+                crit: 14,
+                rank: 1,
+                crit_txt: "bludgeon",
+                atk_txt: "bash",
+            },
+            Weapon {
+                name: "Greatsword",
+                damage: 5,
+                speed: 3,
+                crit: 7,
+                rank: 1,
+                crit_txt: "bisect",
+                atk_txt: "slash",
+            }
+        ]
+    }
 }
 
 impl Blessing {
     pub fn invoke_effect(&self, player: &mut Player, enemy: &mut Enemy) {
         match self.name {
             "Heal" => player.heal(2 + player.devotion / 2),
+            "Greater Heal" => player.heal(3 + player.devotion),
             "Holy Strength" => player.strength += 1,
+            "Divine Strength" => player.strength += 2,
             "Supress" => enemy.dmg_phys -= 1,
             "Holy Wrath" => {
                 enemy.health -= 4;
                 player.heal(2);
                 println!("The burst of holy energy hits the {} for 4 damage", enemy.name);
             },
+            "Divine Wrath" => {
+                enemy.health -= 6;
+                player.heal(4);
+                println!("The burst of holy energy hits the {} for 6 damage", enemy.name);
+            },
             "Protection" => {
                 player.armor += 1;
                 player.armor_magic += 1;
                 println!("Your armor and magic resistance increase!");
+            },
+            "Find Weakness" => {
+                enemy.armor -= 1;
+                enemy.magic_res -= 1;
+            }
+            "Sacrafice" => {
+                let dmg = 2 + player.strength/2 + player.int/2 + player.devotion/2 + player.resolve/2;
+                enemy.health -= dmg;
+                println!("{} is hit for {} damage", enemy.name, dmg);
+                player.health -= player.health/2;
+                println!("You take {} damage", player.health/2);
             }
             _ => panic!("No cast effect for {}", self.name)
         }
@@ -265,11 +323,99 @@ impl Blessing {
             }
         ]
     }
+    pub fn load_t2_blessings() -> Vec<Blessing> {
+        vec! [
+            Blessing {
+                name: "Heal",
+                description: "A basic heal that scales with devotion",
+                speed: 1,
+                retaliation: true,
+                combat_only: false,
+                active_effect: false,
+                invoke_txt: "You bask in holy light, restoring your vitality"
+            },
+            Blessing {
+                name: "Greater Heal",
+                description: "A heal that scales with devotion, slower than Heal",
+                speed: 2,
+                retaliation: true,
+                combat_only: false,
+                active_effect: false,
+                invoke_txt: "You bask in a wave of Holy Light, restoring your vitality"
+            },
+            Blessing {
+                name: "Divine Strength",
+                description: "Increases your strength for this combat",
+                speed: 1,
+                retaliation: false,
+                combat_only: true,
+                active_effect: true,
+                invoke_txt: "You kneel and speak a word of greater power,\n ...your strength increases"
+            },
+            Blessing {
+                name: "Supress",
+                description: "Slightly reduces your enemy's damage for this combat",
+                speed: 1,
+                retaliation: false,
+                combat_only: true,
+                active_effect: false,
+                invoke_txt: "You clasp you hands together and conjure glowing shackles around your foe"
+            },
+            Blessing {
+                name: "Holy Wrath",
+                description: "Strikes your foe with holy light while healing you",
+                speed: 2,
+                retaliation: true,
+                combat_only: true,
+                active_effect: false,
+                invoke_txt: "You reach your hand to the sky pulling holy energy into your body. Pushing your hands foward you unleash it upon your enemy."
+            },
+            Blessing {
+                name: "Protection",
+                description: "Shrounds you in holy energy, increasing your armor",
+                speed: 1,
+                retaliation: true,
+                combat_only: true,
+                active_effect: false,
+                invoke_txt: "You pull the surrounding energy into yourself, shielding you from evil."
+            },
+            Blessing {
+                name: "Divine Wrath",
+                description: "Strikes your foe with holy light while healing you",
+                speed: 2,
+                retaliation: true,
+                combat_only: true,
+                active_effect: false,
+                invoke_txt: "You reach your hand to the sky pulling holy energy into your body. Pushing your hands foward you unleash it upon your enemy."
+            },
+            Blessing {
+                name: "Find Weakness",
+                description: "Lowers your enemy's armor",
+                speed: 1,
+                retaliation: false,
+                combat_only: true,
+                active_effect: false,
+                invoke_txt: "Through your prays you are granted insight"
+            },
+            Blessing {
+                name: "Sacrafice",
+                description: "Sacrafices your health to do great damage to you enemy",
+                speed: 1,
+                retaliation: true,
+                combat_only: true,
+                active_effect: false,
+                invoke_txt: "You stretch arms out wide, pooling all of the surrounding energy within you. 
+                ...Surrounded by Holy Light, you slam your body into you enemy with all of your strengh...
+                        is this it?"
+            },
+        ]
+    }
 }
 
 pub fn remove_effect(player: &mut Player, blessing_name: &'static str) {
     match blessing_name {
         "Holy Strength" => player.strength -= 1,
+        "Divine Strength" => player.strength -= 2,
         "Protection" => {
             player.armor -= 1;
             player.armor_magic -= 1;

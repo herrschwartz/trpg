@@ -234,14 +234,19 @@ impl Player {
         println!("Weapon: {} - dmg {} spd {} crit {}%", self.weapon.name, self.weapon.damage, self.weapon.speed, self.weapon.crit);
         println!("Armor: Physical {} magic {}", self.armor, self.armor_magic);
         println!("---------------------------- \n");
+        println!("Spells:");
         for s in &self.spells {
-            println!("{} - {}", s.name, s.description);
+            println!(" {:<12} - {}", s.name, s.description);
         }
+        println!();
+        println!("Blessings:");
         for b in &self.blessings {
-            println!("{} - {}", b.name, b.description);
+            println!(" {:<12} - {}", b.name, b.description);
         }
+        println!();
+        println!("Weapons:\n");
         for t in &self.weapons {
-            println!("{} - dmg {} spd {} crit {}%", t.name, t.damage, t.speed, t.crit);
+            println!(" {:<12} - dmg {} spd {} crit {}%", t.name, t.damage, t.speed, t.crit);
         }
         println!();
     }

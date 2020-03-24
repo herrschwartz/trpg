@@ -41,7 +41,7 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
             },                                                                
             Some("stats") => player.display_stats(),
             Some("inv") => player.display_inventory(),
-            Some("help") => println!("available commands: attack, cast 'spell name', invoke 'blessing name', stats, inv"),
+            Some("help") => println!("available commands: attack, cast 'spell name', invoke 'blessing name', stats, inv (displays inventory)"),
 
             None => println!("unknown command type 'help' for availible commands"),
             _ => println!("unknown command, type 'help' for availible commands"),
@@ -136,7 +136,7 @@ fn rest(player: &mut Player) {
             Some("invoke") => player.invoke_non_combat(commands.map(|x| x.to_string()).collect::<Vec<String>>().join(" ")),     
             Some("stats") => player.display_stats(),
             Some("inv") => player.display_inventory(),
-            Some("help") => println!("available commands: next (advances to the next room), invoke 'blessing name', equip 'weapon name', stats, inv"),
+            Some("help") => println!("available commands: next (advances to the next room), invoke 'blessing name', equip 'weapon name', stats, inv (displays inventory)"),
 
             None => println!("unknown command type 'help' for availible commands"),
             _ => println!("unknown command, type 'help' for availible commands"),

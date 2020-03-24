@@ -104,7 +104,7 @@ impl Enemy {
         vec!(
             Enemy {
                 name: "Sentry Golem",
-                health: 18,
+                health: 20,
                 dmg_phys: 2,
                 dmg_magic: 0,
                 armor: 4,
@@ -117,7 +117,7 @@ impl Enemy {
             },
             Enemy {
                 name: "Necromancer",
-                health: 15,
+                health: 17,
                 dmg_phys: 0,
                 dmg_magic: 3,
                 armor: 0,
@@ -130,7 +130,7 @@ impl Enemy {
             },
             Enemy {
                 name: "Mercenary",
-                health: 16,
+                health: 18,
                 dmg_phys: 2,
                 dmg_magic: 0,
                 armor: 1,
@@ -143,7 +143,7 @@ impl Enemy {
             },
             Enemy {
                 name: "Corrupted Vines",
-                health: 14,
+                health: 16,
                 dmg_phys: 2,
                 dmg_magic: 0,
                 armor: 2,
@@ -156,7 +156,7 @@ impl Enemy {
             },
             Enemy {
                 name: "Acolyte",
-                health: 16,
+                health: 18,
                 dmg_phys: 1,
                 dmg_magic: 2,
                 armor: 2,
