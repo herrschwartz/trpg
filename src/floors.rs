@@ -1,6 +1,7 @@
 use crate::enemys::Enemy;
 use crate::items::{Spell,Blessing,Weapon};
 use crate::players::Player;
+use crate::combat;
 use rand::prelude::*;
 use std::io::stdin;
 use std::{thread, time};
@@ -15,7 +16,7 @@ pub struct Floor {
     pub rooms: Vec<i32>,
 }
 
-static CHESTS: [&'static str; 5] = ["Gold Chest", "Blue Chest", "Grey Chest", "Purple Chest", "Green Chest"];
+static CHESTS: [&'static str; 6] = ["Gold Chest", "Blue Chest", "Grey Chest", "Purple Chest", "Green Chest", "black chest"];
 
 impl Floor {
     pub fn new(floor_number: i32) -> Floor {
@@ -57,9 +58,10 @@ impl Floor {
         } else if floor_number == 2 {
             let enemys = Enemy::load_t2();
             let spells = Spell::load_t2_spells();
-            let blessings = Blessing::load_t2_blessings(); //TODO: change when designing floor 2
-            let weapons = Weapon::load_t2_weapons(); //TODO: See above
-            let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2, 3];
+            let blessings = Blessing::load_t2_blessings();
+            let weapons = Weapon::load_t2_weapons(); 
+            let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2];
+            rooms.insert(rng.gen_range(0,3), 3);
             rooms.shuffle(&mut rng);
             return Floor {
                 floor_number,
@@ -74,7 +76,7 @@ impl Floor {
                     dmg_magic: 0,
                     armor: 5,
                     magic_res: 0,
-                    speed: 2,
+                    speed: 3,
                     crit: 3,
                     tier: 3,
                     atk_txt: "slams",
@@ -84,6 +86,41 @@ impl Floor {
                        The imposing  Guardian stands before it. A figure in all black with a placid mask stands on its shoulder.
                        before you even get a chance to react the figure jumps down a dispears into a hollow in the trunk.
                        The guardian activates
+                       ERADICATE. INTRUDERS. \n"
+                },
+                rooms
+            }
+        } else if floor_number == 3 {
+            let enemys = Enemy::load_t3();
+            let spells = Spell::load_t2_spells();
+            let blessings = Blessing::load_t2_blessings(); //TODO: change when designing floor 3
+            let weapons = Weapon::load_t2_weapons(); //TODO: See above
+            let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 1, 2];
+            rooms.insert(rng.gen_range(0,4), 3);
+            rooms.shuffle(&mut rng);
+            return Floor {
+                floor_number,
+                enemys,
+                spells,
+                blessings,
+                weapons,
+                boss: Enemy {
+                    name: "Sanctum Guardian",
+                    health: 42,
+                    dmg_phys: 3,
+                    dmg_magic: 0,
+                    armor: 5,
+                    magic_res: 0,
+                    speed: 3,
+                    crit: 3,
+                    tier: 3,
+                    atk_txt: "slams",
+                    entry_txt: "
+                       You make your way into the heart of the Sanctuary.
+                       walking into the expansive room you see the trunk of the great mother in the middle.
+                       The imposing Guardian stands before it. A figure in all black with a placid mask stands on its shoulder.
+                       before you even get a chance to react the figure jumps down a dispears into a hollow in the trunk.
+                       The guardian activates, its skin looks hardened.
                        ERADICATE. INTRUDERS. \n"
                 },
                 rooms
@@ -154,6 +191,23 @@ impl Floor {
             let cleaned = input.trim().to_lowercase();
             let choice = cleaned.as_str();
             if choice == chest1.to_lowercase() || choice == chest2.to_lowercase() {
+                if player.gen.gen_range(0,20) == 19 {
+                    if !combat(player, &mut Enemy {
+                        name: "Mimic",
+                        health: 5 + self.floor_number * 5,
+                        dmg_phys: 2,
+                        dmg_magic: 0,
+                        armor: 1,
+                        magic_res: 1,
+                        speed: 2,
+                        crit: 3,
+                        tier: self.floor_number,
+                        atk_txt: "bites",
+                        entry_txt: "The chest springs to life and leaps at you, trying to devour you with its gaping teeth! \n"
+                    }) {
+                        panic!(""); //this is lazy af
+                    }
+                }
                 match choice {
                     "gold chest" => self.get_random_blessing(player, 1),
                     "blue chest" => self.get_random_spell(player, 2),
@@ -175,6 +229,26 @@ impl Floor {
                             _ => panic!("Out of range in spell chest"),
                         }
                     }
+                    "black chest" => {
+                        match player.gen.gen_range(0,3) {
+                            0 => {
+                                println!("The chest is cursed! you lose 1 resolve");
+                                player.resolve -= 1;
+                                self.get_random_blessing(player, 2);
+                            },
+                            1 => {
+                                println!("The chest is cursed! you lose 1 intellect");
+                                player.int -= 1;
+                                self.get_random_weapon(player, 1);
+                            },
+                            2 => {
+                                println!("The chest is cursed! you lose 1 devotion");
+                                player.devotion -= 1;
+                                self.get_random_spell(player, 3);
+                            },
+                            _=> panic!("Out of range in cursed chest")
+                        }
+                    }
                     _ => panic!("Chest does not exist {}", choice),
                 }
                 break;
@@ -190,11 +264,11 @@ impl Floor {
         This must be an ancient forge used by your ancestors.
         The forge can strengthen your body or conjure magic and item from lifeforce.\n");
 
-        let mut for_sale = vec![("Armor Upgrage", "upgrade", 48 + self.floor_number*2), ("Magic Armor Upgrade", "upgrade", 15 * self.floor_number)];
+        let mut for_sale = vec![("Armor Upgrage", "upgrade", 41 + self.floor_number*2), ("Magic Armor Upgrade", "upgrade", 15 * self.floor_number)];
 
         for _ in 0..player.gen.gen_range(4, 6) {  
             match player.gen.gen_range(0,5) {
-                0 | 1 => for_sale.push((self.blessings[player.gen.gen_range(0, self.blessings.len())].name, "blessing", player.gen.gen_range(6,10) * self.floor_number)),
+                0 | 1 => for_sale.push((self.blessings[player.gen.gen_range(0, self.blessings.len())].name, "blessing", player.gen.gen_range(7,11) * self.floor_number)),
                 2 | 3 => for_sale.push((self.spells[player.gen.gen_range(0, self.spells.len())].name, "spell", player.gen.gen_range(6,10) * self.floor_number)),
                 4     => for_sale.push((self.weapons[player.gen.gen_range(0, self.weapons.len())].name, "weapon", player.gen.gen_range(12, 14) * self.floor_number)),
                 _     => panic!("Out of range random value")
@@ -285,6 +359,14 @@ impl Floor {
     Great walls of stone joined at perpendicular angles surround you.
     There is an obvious path set out before where the intruders have smashed throught the vault doors...
     \n"),
+            3 => 
+    println!("
+    You enter the hollow a dark hole leads into the inner sanctum.
+    You take the plundge falling faster and faster. 
+    Before you hit the ground, your speed starts to slow. 
+    gracefully your feet float down to disrupt the mirrored surface of a shallow pond.
+    The flickering of light bugs lead the way down the great spiral ramp of the sanctum. 
+    "),
     _ => panic!("You're in limbo, something fucked up")
         }
     }

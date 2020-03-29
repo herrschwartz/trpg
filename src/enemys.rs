@@ -104,7 +104,7 @@ impl Enemy {
         vec!(
             Enemy {
                 name: "Sentry Golem",
-                health: 20,
+                health: 18,
                 dmg_phys: 2,
                 dmg_magic: 0,
                 armor: 4,
@@ -117,7 +117,7 @@ impl Enemy {
             },
             Enemy {
                 name: "Necromancer",
-                health: 17,
+                health: 16,
                 dmg_phys: 0,
                 dmg_magic: 3,
                 armor: 0,
@@ -130,7 +130,7 @@ impl Enemy {
             },
             Enemy {
                 name: "Mercenary",
-                health: 18,
+                health: 17,
                 dmg_phys: 2,
                 dmg_magic: 0,
                 armor: 1,
@@ -143,7 +143,7 @@ impl Enemy {
             },
             Enemy {
                 name: "Corrupted Vines",
-                health: 16,
+                health: 15,
                 dmg_phys: 2,
                 dmg_magic: 0,
                 armor: 2,
@@ -156,7 +156,7 @@ impl Enemy {
             },
             Enemy {
                 name: "Acolyte",
-                health: 18,
+                health: 17,
                 dmg_phys: 1,
                 dmg_magic: 2,
                 armor: 2,
@@ -166,6 +166,23 @@ impl Enemy {
                 tier: 2,
                 atk_txt: "cuts",
                 entry_txt: "A women dressed in black and purple robes seemingly comes from nowhere to block you path. She draws a glowing dagger and smiles wickedly  \n"
+            },
+        )
+    }
+    pub fn load_t3() -> Vec<Enemy>{
+        vec!(
+            Enemy {
+                name: "Shadow Image",
+                health: 25,
+                dmg_phys: 2,
+                dmg_magic: 2,
+                armor: 3,
+                magic_res: 3,
+                speed: 3,
+                crit: 4,
+                tier: 3,
+                atk_txt: "chops",
+                entry_txt: "An image of the evil you pursue appears in front of you, sent to slow you but it does not fool your keen senses \n"
             },
         )
     }

@@ -244,7 +244,7 @@ impl Player {
             println!(" {:<12} - {}", b.name, b.description);
         }
         println!();
-        println!("Weapons:\n");
+        println!("Weapons:");
         for t in &self.weapons {
             println!(" {:<12} - dmg {} spd {} crit {}%", t.name, t.damage, t.speed, t.crit);
         }

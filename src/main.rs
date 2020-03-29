@@ -18,8 +18,12 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
     println!(" {:^15}", "Combat");
     println!(" {:-<15}+\n", "+");
     let mut active_effects: Vec<&'static str> = Vec::new();
+    let mut turn_counter = 1;
     while enemy.health > 0 {
         if player.health <= 0 {
+            println!("You have died");
+            let mut input = String::new();
+            stdin().read_line(&mut input).expect("Input Error");
             return false;
         }
 
@@ -46,6 +50,10 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
             None => println!("unknown command type 'help' for availible commands"),
             _ => println!("unknown command, type 'help' for availible commands"),
         }
+        if enemy.name == "Sanctum Guardian" {
+            sanctum_guardian(turn_counter, enemy);
+        }
+        turn_counter += 1;
     }
     thread::sleep(time::Duration::from_millis(600));
     println!("The {} is defeated!", enemy.name);
@@ -73,6 +81,24 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
     true
 }
 
+fn sanctum_guardian(turn_counter: i32, mut enemy: &mut Enemy) {
+    if turn_counter % 3 == 0 {
+        if enemy.magic_res == 0 {
+            println!("The Guardian's outer shell harders, the runes stop glowing");
+            enemy.magic_res = 5;
+            enemy.armor = 1;
+            enemy.dmg_phys = 0;
+            enemy.dmg_magic = 3;
+        } else {
+            println!("The Guardians's body and limbs glow with magic runes");
+            enemy.magic_res = 0;
+            enemy.armor = 5;
+            enemy.dmg_phys = 3;
+            enemy.dmg_magic = 0;
+        }
+    }
+}
+
 fn main() {
     let mut player = Player::new();
     println!("Welcome, at any point you can enter 'help' to get information on commands");
@@ -86,7 +112,6 @@ fn main() {
            Some(1) => {
                 let mut enemy = floor.enemys[player.gen.gen_range(0, floor.enemys.len())];
                 if !combat(&mut player, &mut enemy) {
-                    println!("You have died");
                     break;
                 } 
             },
@@ -101,7 +126,6 @@ fn main() {
             //Once all rooms are completed, boss time
             None => {
                 if !combat(&mut player, &mut floor.boss) {
-                    println!("You have died");
                     break;
                 };
                 floor = Floor::new(floor.floor_number + 1);

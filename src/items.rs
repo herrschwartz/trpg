@@ -179,7 +179,7 @@ impl Weapon {
                 name: "Claymore",
                 damage: 5,
                 speed: 3,
-                crit: 4,
+                crit: 3,
                 rank: 1,
                 crit_txt: "destroy",
                 atk_txt: "slash",
@@ -210,7 +210,7 @@ impl Weapon {
                 name: "War Hammer",
                 damage: 2,
                 speed: 2,
-                crit: 14,
+                crit: 20,
                 rank: 1,
                 crit_txt: "bludgeon",
                 atk_txt: "bash",
@@ -231,7 +231,7 @@ impl Weapon {
 impl Blessing {
     pub fn invoke_effect(&self, player: &mut Player, enemy: &mut Enemy) {
         match self.name {
-            "Heal" => player.heal(2 + player.devotion / 2),
+            "Heal" => player.heal(3 + player.devotion / 2),
             "Greater Heal" => player.heal(3 + player.devotion),
             "Holy Strength" => player.strength += 1,
             "Divine Strength" => player.strength += 2,
