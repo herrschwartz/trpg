@@ -10,7 +10,7 @@ use players::Player;
 use std::{thread, time};
 use items::remove_effect;
 
-static LEVELS: [i32; 12] = [5, 10, 20, 40, 80, 150, 200, 250, 400, 600, 800, 1000];
+static LEVELS: [i32; 12] = [5, 10, 20, 35, 50, 65, 85, 100, 400, 600, 800, 1000];
 
 fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
     println!("{}", enemy.entry_txt);
@@ -73,11 +73,8 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
     player.lifeforce += lf;
     thread::sleep(time::Duration::from_millis(600));
     //grant experiance and level if needed
-    player.exp += enemy.tier * 2;
-    if player.exp >= LEVELS[(player.level - 1) as usize] {
-        println!("Ding! you leveled up!");
-        player.level_up(1, 1, false);
-    }
+    player.give_exp(enemy.tier * 2);
+
     true
 }
 
@@ -122,6 +119,9 @@ fn main() {
             //Shop
             Some(3) => {
                 floor.shop(&mut player);
+            }
+            Some(4) => {
+                floor.special_room(&mut player);
             }
             //Once all rooms are completed, boss time
             None => {

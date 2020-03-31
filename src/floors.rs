@@ -14,9 +14,10 @@ pub struct Floor {
     pub blessings: Vec<Blessing>,
     pub weapons: Vec<Weapon>,
     pub rooms: Vec<i32>,
+    pub special_rooms: Vec<&'static str>,
 }
 
-static CHESTS: [&'static str; 6] = ["Gold Chest", "Blue Chest", "Grey Chest", "Purple Chest", "Green Chest", "black chest"];
+static CHESTS: [&'static str; 6] = ["Gold Chest", "Blue Chest", "Grey Chest", "Purple Chest", "Green Chest", "Black Chest"];
 
 impl Floor {
     pub fn new(floor_number: i32) -> Floor {
@@ -26,8 +27,10 @@ impl Floor {
             let spells = Spell::load_t1_spells();
             let blessings = Blessing::load_t1_blessings();
             let weapons = Weapon::load_t1_weapons();
-            let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 2];
+            let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 2, 4];
+            let mut special_rooms: Vec<&'static str> = vec!["hag", "sacrafice", "specialize"];
             rooms.shuffle(&mut rng);
+            special_rooms.shuffle(&mut rng);
             rooms.insert(rng.gen_range(0,2), 3);
             return Floor {
                 floor_number,
@@ -35,6 +38,7 @@ impl Floor {
                 spells,
                 blessings,
                 weapons,
+                special_rooms,
                 boss: Enemy{
                     name: "Foreman",
                     health: 25,
@@ -61,14 +65,17 @@ impl Floor {
             let blessings = Blessing::load_t2_blessings();
             let weapons = Weapon::load_t2_weapons(); 
             let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2];
+            let mut special_rooms: Vec<&'static str> = vec!["hag", "sacrafice"]; //TODO: floor 2 rooms
             rooms.insert(rng.gen_range(0,3), 3);
             rooms.shuffle(&mut rng);
+            special_rooms.shuffle(&mut rng);
             return Floor {
                 floor_number,
                 enemys,
                 spells,
                 blessings,
                 weapons,
+                special_rooms,
                 boss: Enemy {
                     name: "Sanctum Guardian",
                     health: 42,
@@ -96,14 +103,17 @@ impl Floor {
             let blessings = Blessing::load_t2_blessings(); //TODO: change when designing floor 3
             let weapons = Weapon::load_t2_weapons(); //TODO: See above
             let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 1, 2];
+            let mut special_rooms: Vec<&'static str> = vec!["hag", "sacrafice"]; //TODO: floor 3 rooms
             rooms.insert(rng.gen_range(0,4), 3);
             rooms.shuffle(&mut rng);
+            special_rooms.shuffle(&mut rng);
             return Floor {
                 floor_number,
                 enemys,
                 spells,
                 blessings,
                 weapons,
+                special_rooms,
                 boss: Enemy {
                     name: "Sanctum Guardian",
                     health: 42,
@@ -132,6 +142,7 @@ impl Floor {
             spells: vec![],
             weapons: vec![],
             blessings: vec![],
+            special_rooms: vec![],
             boss: Enemy {
                 name: "Error",
                 health: 8,
@@ -174,6 +185,16 @@ impl Floor {
             player.weapons.push(weapon);
             thread::sleep(time::Duration::from_millis(600));
         }
+    }
+
+    pub fn get_single_command(&self) -> String {
+        let mut input = String::new();
+        stdin().read_line(&mut input).expect("Input Error");
+
+        let cleaned = input.trim().to_lowercase();
+        let mut commands = cleaned.split_whitespace();
+        let cmd = commands.next().unwrap_or_default();
+        cmd.to_owned()
     }
 
     pub fn item_room(&self, player: &mut Player) {
@@ -248,6 +269,8 @@ impl Floor {
                             },
                             _=> panic!("Out of range in cursed chest")
                         }
+                        player.lifeforce += 10;
+                        println!("You gain 10 lifeforce");
                     }
                     _ => panic!("Chest does not exist {}", choice),
                 }
@@ -264,7 +287,7 @@ impl Floor {
         This must be an ancient forge used by your ancestors.
         The forge can strengthen your body or conjure magic and item from lifeforce.\n");
 
-        let mut for_sale = vec![("Armor Upgrage", "upgrade", 41 + self.floor_number*2), ("Magic Armor Upgrade", "upgrade", 15 * self.floor_number)];
+        let mut for_sale = vec![("Armor Upgrage", "upgrade", 38 + self.floor_number*2), ("Magic Armor Upgrade", "upgrade", 15 * self.floor_number)];
 
         for _ in 0..player.gen.gen_range(4, 6) {  
             match player.gen.gen_range(0,5) {
@@ -281,13 +304,8 @@ impl Floor {
        }
 
        loop {
-            let mut input = String::new();
-            stdin().read_line(&mut input).expect("Input Error");
-
-            let cleaned = input.trim().to_lowercase();
-            let mut commands = cleaned.split_whitespace();
-            let cmd = commands.next().unwrap_or_default();
-
+            let cm = self.get_single_command();
+            let cmd = cm.as_str();
             match cmd {
                 "1" | "2" | "3" | "4" | "5" | "6" | "7" => {
                     let n: usize = cmd.parse().unwrap();
@@ -343,6 +361,43 @@ impl Floor {
        }
     }
 
+    pub fn special_room(&mut self, player: &mut Player) {
+        match self.special_rooms.pop() {
+            Some("hag") => {
+                println!("
+                The room is dim and damp, great roots line the ceiling.
+                An old chrone is hunched over in the center of the room.
+                \"I can grant you stamina for your journey, if you so desire\"\n");
+                println!("1) Ask her to heal you (+6 health)");
+                println!("2) Ask her for her enchantment (+3 max health)");
+                println!("3) Slay the hag (+5 lifeforce)");
+                match self.get_single_command().as_str() {
+                    "1" => println!("good"),
+                    "2" => println!("nice"),
+                    "3" => println!("cool"),
+                    "stats" => player.display_stats(),
+                    "inv" => player.display_inventory(),
+                    _ => println!("not good"),
+                }
+            },
+            Some("specialize") => {
+                println!("
+                You push your way through thick roots to get past though this room. 
+                Almost through you see the roots move in a perculiar way. 
+                They twist into the shape of a face before your eyes. 
+                \"Ahhh young one, you have a great task ahead of you. What will you make of it?\"\n");
+                println!("1) I want to be a brave warrior");
+                println!("2) I will be a devout follower of the great mother");
+                println!("2) I wish to be a powerful sorcerer");
+            },
+            Some("sacrafice") => {
+                println!("risk/reward");
+            }
+            None => println!("Somehow all of the special rooms are exhausted"),
+            _ => panic!("There was in error in special rooms")
+        }
+    }
+
     pub fn print_entry_txt(&self) {
         match self.floor_number {
             1 => 
@@ -364,8 +419,8 @@ impl Floor {
     You enter the hollow a dark hole leads into the inner sanctum.
     You take the plundge falling faster and faster. 
     Before you hit the ground, your speed starts to slow. 
-    gracefully your feet float down to disrupt the mirrored surface of a shallow pond.
-    The flickering of light bugs lead the way down the great spiral ramp of the sanctum. 
+    Gracefully your feet float down to disrupt the mirrored surface of a shallow pond.
+    The flickering of glowing bugs lead the way down the great spiral ramp of the inner sanctum. 
     "),
     _ => panic!("You're in limbo, something fucked up")
         }

@@ -193,7 +193,7 @@ impl Player {
 
         for _ in 0..random {
             match self.gen.gen_range(0,4) {
-                0 => {self.strength += 1; println!("Your stength increases by 1")},
+                0 => {self.strength += 1; println!("Your strength increases by 1")},
                 1 => {self.int += 1; println!("Your intellect increases by 1")},
                 2 => {self.devotion += 1; println!("Your devotion increases by 1")},
                 3 => {self.resolve += 1; println!("Your resolve increases by 1")},
@@ -236,19 +236,33 @@ impl Player {
         println!("---------------------------- \n");
         println!("Spells:");
         for s in &self.spells {
-            println!(" {:<12} - {}", s.name, s.description);
+            println!(" {:<14} - {}", s.name, s.description);
         }
         println!();
         println!("Blessings:");
         for b in &self.blessings {
-            println!(" {:<12} - {}", b.name, b.description);
+            println!(" {:<14} - {}", b.name, b.description);
         }
         println!();
         println!("Weapons:");
         for t in &self.weapons {
-            println!(" {:<12} - dmg {} spd {} crit {}%", t.name, t.damage, t.speed, t.crit);
+            println!(" {:<14} - dmg {} spd {} crit {}%", t.name, t.damage, t.speed, t.crit);
         }
         println!();
+    }
+
+    pub fn give_lifeforce(&mut self, amount: i32) {
+        println!("You gain {} Lifeforce", amount);
+        self.lifeforce += amount;
+    }
+
+    pub fn give_exp(&mut self, amount: i32) {
+        println!("You gain {} exp", amount);
+        self.exp += amount;
+        if self.exp >= LEVELS[(self.level - 1) as usize] {
+            println!("Ding! you leveled up!");
+            self.level_up(1, 1, false);
+        }
     }
 
     pub fn equip(&mut self, weapon_name: String) {

@@ -121,7 +121,7 @@ impl Spell {
                 name: "Fire Spear", 
                 description: "A quick and piercing fire spell", 
                 speed: 1, 
-                damage: 7, 
+                damage: 8, 
                 kind: "fire",
                 atk_txt: "You channel all of your strength into your hands. Releasing the fire within"
             },
