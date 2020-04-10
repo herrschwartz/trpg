@@ -64,8 +64,8 @@ impl Floor {
             let spells = Spell::load_t2_spells();
             let blessings = Blessing::load_t2_blessings();
             let weapons = Weapon::load_t2_weapons(); 
-            let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2];
-            let mut special_rooms: Vec<&'static str> = vec!["hag", "sacrafice"]; //TODO: floor 2 rooms
+            let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2, 4, 4];
+            let mut special_rooms: Vec<&'static str> = vec!["enchant", "sacrafice2", "hilt", "resolve"]; //TODO: floor 2 rooms
             rooms.insert(rng.gen_range(0,3), 3);
             rooms.shuffle(&mut rng);
             special_rooms.shuffle(&mut rng);
@@ -81,45 +81,7 @@ impl Floor {
                     health: 42,
                     dmg_phys: 3,
                     dmg_magic: 0,
-                    armor: 5,
-                    magic_res: 0,
-                    speed: 3,
-                    crit: 3,
-                    tier: 3,
-                    atk_txt: "slams",
-                    entry_txt: "
-                       You make your way into the heart of the Sanctuary.
-                       walking into the expansive room you see the trunk of the great mother in the middle.
-                       The imposing  Guardian stands before it. A figure in all black with a placid mask stands on its shoulder.
-                       before you even get a chance to react the figure jumps down a dispears into a hollow in the trunk.
-                       The guardian activates
-                       ERADICATE. INTRUDERS. \n"
-                },
-                rooms
-            }
-        } else if floor_number == 3 {
-            let enemys = Enemy::load_t3();
-            let spells = Spell::load_t2_spells();
-            let blessings = Blessing::load_t2_blessings(); //TODO: change when designing floor 3
-            let weapons = Weapon::load_t2_weapons(); //TODO: See above
-            let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 1, 2];
-            let mut special_rooms: Vec<&'static str> = vec!["hag", "sacrafice"]; //TODO: floor 3 rooms
-            rooms.insert(rng.gen_range(0,4), 3);
-            rooms.shuffle(&mut rng);
-            special_rooms.shuffle(&mut rng);
-            return Floor {
-                floor_number,
-                enemys,
-                spells,
-                blessings,
-                weapons,
-                special_rooms,
-                boss: Enemy {
-                    name: "Sanctum Guardian",
-                    health: 42,
-                    dmg_phys: 3,
-                    dmg_magic: 0,
-                    armor: 5,
+                    armor: 10,
                     magic_res: 0,
                     speed: 3,
                     crit: 3,
@@ -130,8 +92,41 @@ impl Floor {
                        walking into the expansive room you see the trunk of the great mother in the middle.
                        The imposing Guardian stands before it. A figure in all black with a placid mask stands on its shoulder.
                        before you even get a chance to react the figure jumps down a dispears into a hollow in the trunk.
-                       The guardian activates, its skin looks hardened.
+                       The guardian activates, its armor looks thick
                        ERADICATE. INTRUDERS. \n"
+                },
+                rooms
+            }
+        } else if floor_number == 3 {
+            let enemys = Enemy::load_t3();
+            let spells = Spell::load_t2_spells();
+            let blessings = Blessing::load_t2_blessings(); //TODO: change when designing floor 3
+            let weapons = Weapon::load_t2_weapons(); //TODO: See above
+            let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2];
+            let mut special_rooms: Vec<&'static str> = vec!["hag", "hag"]; //TODO: floor 3 rooms
+            rooms.insert(rng.gen_range(0,3), 3);
+            rooms.shuffle(&mut rng);
+            special_rooms.shuffle(&mut rng);
+            return Floor {
+                floor_number,
+                enemys,
+                spells,
+                blessings,
+                weapons,
+                special_rooms,
+                boss: Enemy {
+                    name: "This should be the last boss",
+                    health: 42,
+                    dmg_phys: 300000,
+                    dmg_magic: 0,
+                    armor: 10,
+                    magic_res: 0,
+                    speed: 3,
+                    crit: 3,
+                    tier: 3,
+                    atk_txt: "boops",
+                    entry_txt: "
+                       last boss text \n"
                 },
                 rooms
             }
@@ -184,6 +179,34 @@ impl Floor {
             println!("You recieved {}", weapon.name);
             player.weapons.push(weapon);
             thread::sleep(time::Duration::from_millis(600));
+        }
+    }
+
+    pub fn get_choice(&self, choices: Vec<&'static str>, player: &Player,) -> usize {
+        for (i, item) in choices.iter().enumerate() {
+            println!("{}) {}", i+1, item)
+        }
+        
+        loop {
+            let cmd = self.get_single_command();
+            let choice = cmd.as_str();
+            match choice {
+                "1" | "2" | "3" | "4" | "5" | "6" | "7" => {
+                    let n: usize = cmd.parse().unwrap();
+                    if n <= choices.len() {
+                        return n;
+                    }
+                }
+                "inv"    => player.display_inventory(),
+                "stats"  => player.display_stats(),
+                "relist" => {
+                    for (i, item) in choices.iter().enumerate() {
+                        println!("{}) {}", i+1, item)
+                    }
+                }
+                "help"   => println!("Enter the number of the choice you wish to choose, \ncommands: inv, stats, relist (relists choices)"),
+                _ => println!("Invalid command {} - Enter the number of the choice you wish to choose, type help for availible commands", cmd),
+            }
         }
     }
 
@@ -368,16 +391,19 @@ impl Floor {
                 The room is dim and damp, great roots line the ceiling.
                 An old chrone is hunched over in the center of the room.
                 \"I can grant you stamina for your journey, if you so desire\"\n");
-                println!("1) Ask her to heal you (+6 health)");
-                println!("2) Ask her for her enchantment (+3 max health)");
-                println!("3) Slay the hag (+5 lifeforce)");
-                match self.get_single_command().as_str() {
-                    "1" => println!("good"),
-                    "2" => println!("nice"),
-                    "3" => println!("cool"),
-                    "stats" => player.display_stats(),
-                    "inv" => player.display_inventory(),
-                    _ => println!("not good"),
+
+                match self.get_choice(vec!["Ask her to heal you (+6 health)", 
+                                           "Ask her for her enchantment (+3 max health)",
+                                           "Slay the hag (+5 lifeforce)"], player) 
+                {
+                    1 => player.heal(6),
+                    2 => {
+                        player.max_health += 3;
+                        println!("The old lady mutters some ancient words you don't know");
+                        println!("Your maximum health increases by 3");
+                    },
+                    3 => player.give_lifeforce(5),
+                    _ => panic!("Error hag out of range"),
                 }
             },
             Some("specialize") => {
@@ -386,15 +412,179 @@ impl Floor {
                 Almost through you see the roots move in a perculiar way. 
                 They twist into the shape of a face before your eyes. 
                 \"Ahhh young one, you have a great task ahead of you. What will you make of it?\"\n");
-                println!("1) I want to be a brave warrior");
-                println!("2) I will be a devout follower of the great mother");
-                println!("2) I wish to be a powerful sorcerer");
+
+                match self.get_choice(vec!["I want to be a brave warrior", 
+                                           "I will be a devout follower of the great mother",
+                                           "I wish to be a powerful sorcerer"], player) 
+                {
+                    1 => {
+                        println!("Good ... I will bring out your inner stength so that you may fight then");
+                        thread::sleep(time::Duration::from_millis(600));
+                        player.resolve += 1;
+                        println!("Your resolve increases by 1");
+                    }
+                    2 => {
+                        println!("Ahhh ... I am glad to hear it young one, blessed be your path");
+                        thread::sleep(time::Duration::from_millis(600));
+                        self.get_random_blessing(player, 1);
+                        player.devotion += 1;
+                        println!("Your devotion increases by 1");
+                    }
+                    3 => {
+                        println!("hmmm ... unconventional for our kind, but so be it");
+                        thread::sleep(time::Duration::from_millis(600));
+                        self.get_random_spell(player, 2);
+                        player.int += 1;
+                        println!("Your intellect increases by 1");
+                    }
+                    _ => panic!("Out of bound for specialize"),
+                }
             },
             Some("sacrafice") => {
-                println!("risk/reward");
+                println!("
+                Along one of the hall you spot a glowing red orb
+                You may be able to absorb some lifeforce from it, but it will certainly cost you.
+                ");
+                match self.get_choice(vec![
+                    "Touch the orb (-3 health, +4 Lifeforce)",
+                    "Palm the orb (-5 health, +7 Lifeforce)",
+                    "It looks evil (leave)",
+                ], player) {
+                    1 => { 
+                        println!("You take 3 damage");
+                        player.give_lifeforce(4);
+                        player.health -= 3;
+                    }
+                    2 => { 
+                        println!("You take 5 damage");
+                        player.health -= 5;
+                        player.give_lifeforce(7);
+                    }
+                    3 => println!("You ignore the orb an hurry along the path"),
+                    _ => panic!("sacrafice out of bounds"),
+                }
+                if player.health <= 0 {
+                    println!("you died");
+                    panic!("");
+                }
             }
+            Some("sacrafice2") => {
+                println!("
+                Along one of the hall you spot a glowing red orb
+                You may be able to absorb some lifeforce from it, but it will certainly cost you.
+                ");
+                match self.get_choice(vec![
+                    "Touch the orb (-4 health, +6 Lifeforce)",
+                    "Palm the orb (-6 health, +8 Lifeforce)",
+                    "It looks evil (leave)",
+                ], player) {
+                    1 => { 
+                        println!("You take 4 damage");
+                        player.give_lifeforce(6);
+                        player.health -= 4;
+                    }
+                    2 => { 
+                        println!("You take 6 damage");
+                        player.health -= 6;
+                        player.give_lifeforce(8);
+                    }
+                    3 => println!("You ignore the orb an hurry along the path"),
+                    _ => panic!("sacrafice out of bounds"),
+                }
+                if player.health <= 0 {
+                    println!("you died");
+                    panic!("");
+                }
+            }
+            Some("enchant") => {
+                println!("
+                You notice this room is brighter than the others,
+                A shaft of brilliant blue light beams through the center.
+                Maybe putting your weapon in it will have and effect?
+                ");
+                match self.get_choice(vec![
+                    "Enchant you weapon (10 lifeforce)",
+                    "leave",
+                ], player) {
+                    1 => {
+                        if player.lifeforce >= 10 {
+                            println!("You dip your {} in the light, critical strike chance increases by 5%", player.weapon.name);
+                            player.weapon.crit += 5;
+                            player.lifeforce -= 10;
+                        }
+                        else {
+                            println!("You don't have enough lifeforce to enchant your weapon");
+                        }
+                    }
+                    2 => println!("Theres no time to mess with that."),
+                    _ => panic!("sacrafice out of bounds"),
+                }
+            }
+            Some("resolve") => {
+                println!("
+                A figure comes out of nowhere and grabs you by your shoulders,
+                \"Do you have what it takes, can you save us?\"
+                His knareled hands dig into you.
+                ");
+                match self.get_choice(vec![
+                    "I do, I will win (requires 4 resolve)",
+                    "I'm not sure",
+                    "leave",
+                ], player) {
+                    1 => {
+                        if player.resolve >= 4 {
+                            println!("\"Good I believe you can do it!\"");
+                            player.heal(4);
+                            player.devotion += 1;
+                            println!("Your devotion increases by 1");
+                        }
+                        else {
+                            println!("\"I don't believe you young one\"");
+                        }
+                    }
+                    2 => {
+                        player.heal(4);
+                        println!("\"You should have more faith in yourself\"")
+                    }
+                    3 => println!("You free yourself from his grasp and hurry away."),
+                    _ => panic!("sacrafice out of bounds"),
+                }
+            }
+            Some("hilt") => {
+                println!("
+                A dimly illuminated alter glows in the darkness,
+                There is an ornate blade hilt on next to a pile of scrolls.
+                ");
+                match self.get_choice(vec![
+                    "Take the hilt",
+                    "take the scrolls",
+                ], player) {
+                    1 => {  
+                        println!("You take the old hilt, but it doesn't seem very useful for now");
+                        player.hilt = true;
+                    }
+                    2 => {
+                        println!("you grab the dusty old scolls");
+                        println!("you receive Ancient Knowledge");
+                        self.get_random_spell(player, 1);
+                        player.blessings.push(
+                            Blessing {
+                                name: "Ancient Knowledge",
+                                description: "increases your intellect permanently",
+                                speed: 1,
+                                retaliation: false,
+                                combat_only: false,
+                                active_effect: false,
+                                invoke_txt: "The information contained within this scroll is truely profound"
+                            }
+                        )
+                    }
+                    _ => panic!("sacrafice out of bounds"),
+                }
+            }
+            
             None => println!("Somehow all of the special rooms are exhausted"),
-            _ => panic!("There was in error in special rooms")
+            _ => panic!("There was in error in special rooms"),
         }
     }
 

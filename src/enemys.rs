@@ -19,25 +19,21 @@ pub struct Enemy {
 }
 
 impl Enemy {
-    pub fn attack(&mut self, speed_of_action: i32, player: &mut Player) {
-        let mut num_atks_enemy:i32 = (speed_of_action as f32 / self.speed as f32).ceil() as i32;
-        if num_atks_enemy < 1 {num_atks_enemy = 1}
+    pub fn attack(&mut self, player: &mut Player) {
+        let mut dmg_amt = self.dmg_phys + player.gen.gen_range(0, self.tier + 1) - player.armor;
+        let dmg_magic = self.dmg_magic - player.armor_magic;
+        if dmg_magic > 0 {dmg_amt += dmg_magic}
+        if dmg_amt < 0 {dmg_amt = 0}
 
-        for _ in 0.. num_atks_enemy {
-            let mut dmg_amt = self.dmg_phys + player.gen.gen_range(0, self.tier + 1) - player.armor;
-            let dmg_magic = self.dmg_magic - player.armor_magic;
-            if dmg_magic > 0 {dmg_amt += dmg_magic}
-            if dmg_amt < 0 {dmg_amt = 0}
-
-            if self.crit >= player.gen.gen_range(1, 101) {
-                player.health -= dmg_amt * 2;
-                println!("The {} Crits you for {} damage!! \n", self.name, dmg_amt * 2)
-            } else {
-                player.health -= dmg_amt;
-                println!("The {} {} you for {} damage \n", self.name, self.atk_txt, dmg_amt)
-            }
-            thread::sleep(time::Duration::from_millis(600));
+        if self.crit >= player.gen.gen_range(1, 101) {
+            player.health -= dmg_amt * 2;
+            println!("The {} Crits you for {} damage!! \n", self.name, dmg_amt * 2)
+        } else {
+            player.health -= dmg_amt;
+            println!("The {} {} you for {} damage \n", self.name, self.atk_txt, dmg_amt)
         }
+        thread::sleep(time::Duration::from_millis(600));
+
     }
     pub fn new() -> Enemy {
         Enemy{name: "placeholder",health: 1,dmg_phys: 1,dmg_magic: 1,armor: 1
@@ -58,6 +54,19 @@ impl Enemy {
                 tier: 1,
                 atk_txt: "claws",
                 entry_txt: "A rat scurries up from the darkness, it has become large and fat from chewing on the limbs of your ancestors \n"
+            },
+            Enemy {
+                name: "glowbug",
+                health: 10,
+                dmg_phys: 0,
+                dmg_magic: 1,
+                armor: 0,
+                magic_res: 0,
+                speed: 2,
+                crit: 5,
+                tier: 1,
+                atk_txt: "dusts",
+                entry_txt: "You hear a buzzing in the air, as it grows louder you begin to see a light. as you stare you notice it's coming right for your head! \n"
             },
             Enemy {
                 name: "Axeman",
@@ -183,6 +192,32 @@ impl Enemy {
                 tier: 3,
                 atk_txt: "chops",
                 entry_txt: "An image of the evil you pursue appears in front of you, sent to slow you but it does not fool your keen senses \n"
+            },
+            Enemy {
+                name: "Shadow fiend",
+                health: 23,
+                dmg_phys: 1,
+                dmg_magic: 1,
+                armor: 3,
+                magic_res: 2,
+                speed: 1,
+                crit: 4,
+                tier: 3,
+                atk_txt: "bites",
+                entry_txt: "A doglike creature springs out of the darkness as you descend the ramp, a sign of the spreading corruption \n"
+            },
+            Enemy {
+                name: "Crazed Ent",
+                health: 24,
+                dmg_phys: 3,
+                dmg_magic: 0,
+                armor: 3,
+                magic_res: 3,
+                speed: 2,
+                crit: 3,
+                tier: 3,
+                atk_txt: "sweeps",
+                entry_txt: "The ground shakes and you see an ent charging up the ramp towards you, somthing is wrong though... \n"
             },
         )
     }

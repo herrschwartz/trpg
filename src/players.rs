@@ -24,6 +24,8 @@ pub struct Player {
     pub resolve: i32,
     pub devotion: i32,
 
+    pub hilt: bool,
+
     pub gen: rand::rngs::ThreadRng
 }
 
@@ -43,13 +45,15 @@ impl Player {
                         speed: 1, damage: 2, kind: "arcane",
                         atk_txt: "Your hands fume with perverse energies, they coalese into a dense bead"}],
             weapons: vec![],
-            blessings: vec![Blessing {name: "Heal",description: "A basic heal that scales with devotion",
+            blessings: vec![Blessing {name: "Heal", description: "A basic heal that scales with devotion",
                             speed: 1, retaliation: true, combat_only: false, active_effect: false,
                             invoke_txt: "You bask in holy light, restoring your vitality"}],
             strength: 3,
             int: 3,
             resolve: 2,
             devotion: 2,
+
+            hilt: false,
             gen: rng
         }
     }
@@ -69,6 +73,9 @@ impl Player {
         for _ in 0..num_atks {
             let mut dmg_amt = self.weapon.damage + self.gen.gen_range(1, self.strength) - target.armor;
             if dmg_amt < 0 {dmg_amt = 0}
+            if self.weapon.speed == 1 && target.speed > 1 && dmg_amt > 4 {
+                dmg_amt = (dmg_amt as f32 * 0.8) as i32;
+            }
 
             if self.weapon.crit >= self.gen.gen_range(1, 101) {
                 target.health -= dmg_amt * 2;
@@ -86,7 +93,7 @@ impl Player {
 
         //enemy retaliation
         thread::sleep(time::Duration::from_millis(600));
-        target.attack(self.weapon.speed, self);
+        target.attack(self);
     }
 
     pub fn cast_spell(&mut self, target: &mut Enemy, spell_name: String) {
@@ -110,7 +117,7 @@ impl Player {
                     return 
                 }
                 //enemy attacks back
-                target.attack(spell.speed, self);
+                target.attack(self);
 
                 //remove used spell from inventory
                 self.spells.remove(spell_pos);
@@ -129,7 +136,7 @@ impl Player {
                 blessing.invoke_effect(self, target);
 
                 if blessing.retaliation {
-                    target.attack(blessing.speed, self);
+                    target.attack(self);
                 }
 
                 self.blessings.remove(blessing_pos);

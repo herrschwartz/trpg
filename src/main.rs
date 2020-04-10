@@ -66,6 +66,7 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
     //remove active effects
     for e in active_effects {
         remove_effect(player, e);
+        println!("{}",e);
     }
 
     let lf = enemy.tier * 10 - player.gen.gen_range(0, (enemy.tier * 10) / 2 + 1);
@@ -81,20 +82,21 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
 fn sanctum_guardian(turn_counter: i32, mut enemy: &mut Enemy) {
     if turn_counter % 3 == 0 {
         if enemy.magic_res == 0 {
-            println!("The Guardian's outer shell harders, the runes stop glowing");
-            enemy.magic_res = 5;
+            println!("The Guardians's body and limbs glow with magic runes");
+            enemy.magic_res = 10;
             enemy.armor = 1;
             enemy.dmg_phys = 0;
             enemy.dmg_magic = 3;
         } else {
-            println!("The Guardians's body and limbs glow with magic runes");
+            println!("The Guardian's outer shell hardens, the runes stop glowing");
             enemy.magic_res = 0;
-            enemy.armor = 5;
+            enemy.armor = 10;
             enemy.dmg_phys = 3;
             enemy.dmg_magic = 0;
         }
     }
 }
+
 
 fn main() {
     let mut player = Player::new();

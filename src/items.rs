@@ -255,6 +255,10 @@ impl Blessing {
                 enemy.armor -= 1;
                 enemy.magic_res -= 1;
             }
+            "Ancient Knowledge" => {
+                player.int += 1;
+                println!("You intellect increases by 1");
+            }
             "Sacrafice" => {
                 let dmg = 2 + player.strength/2 + player.int/2 + player.devotion/2 + player.resolve/2;
                 enemy.health -= dmg;
@@ -318,7 +322,7 @@ impl Blessing {
                 speed: 1,
                 retaliation: true,
                 combat_only: true,
-                active_effect: false,
+                active_effect: true,
                 invoke_txt: "You pull the surrounding energy into yourself, shielding you from evil."
             }
         ]
@@ -376,7 +380,7 @@ impl Blessing {
                 speed: 1,
                 retaliation: true,
                 combat_only: true,
-                active_effect: false,
+                active_effect: true,
                 invoke_txt: "You pull the surrounding energy into yourself, shielding you from evil."
             },
             Blessing {
@@ -395,7 +399,7 @@ impl Blessing {
                 retaliation: false,
                 combat_only: true,
                 active_effect: false,
-                invoke_txt: "Through your prays you are granted insight"
+                invoke_txt: "Through your prayers you are granted insight"
             },
             Blessing {
                 name: "Sacrafice",
