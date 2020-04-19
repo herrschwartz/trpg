@@ -182,7 +182,7 @@ impl Enemy {
         vec!(
             Enemy {
                 name: "Shadow Image",
-                health: 25,
+                health: 26,
                 dmg_phys: 2,
                 dmg_magic: 2,
                 armor: 3,
@@ -195,7 +195,7 @@ impl Enemy {
             },
             Enemy {
                 name: "Shadow fiend",
-                health: 23,
+                health: 24,
                 dmg_phys: 1,
                 dmg_magic: 1,
                 armor: 3,
@@ -208,7 +208,7 @@ impl Enemy {
             },
             Enemy {
                 name: "Crazed Ent",
-                health: 24,
+                health: 25,
                 dmg_phys: 3,
                 dmg_magic: 0,
                 armor: 3,
@@ -218,6 +218,32 @@ impl Enemy {
                 tier: 3,
                 atk_txt: "sweeps",
                 entry_txt: "The ground shakes and you see an ent charging up the ramp towards you, somthing is wrong though... \n"
+            },
+            Enemy {
+                name: "Living Branches",
+                health: 26,
+                dmg_phys: 2,
+                dmg_magic: 0,
+                armor: 4,
+                magic_res: 1,
+                speed: 1,
+                crit: 5,
+                tier: 3,
+                atk_txt: "grasp",
+                entry_txt: "The path is thick with brances, in fact it seems to be getting thicker every step \n"
+            },
+            Enemy {
+                name: "Enchanted Wall",
+                health: 6,
+                dmg_phys: 0,
+                dmg_magic: 2,
+                armor: 12,
+                magic_res: 1,
+                speed: 3,
+                crit: 0,
+                tier: 3,
+                atk_txt: "reflects your hit back at you",
+                entry_txt: "Suddenly a wall springs up from the ground, there is no way around \n"
             },
         )
     }

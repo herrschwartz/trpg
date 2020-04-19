@@ -60,7 +60,7 @@ impl Spell {
                 name: "Fire Blast", 
                 description: "Slower to cast than a fireball, but sure to get the job done", 
                 speed: 2, 
-                damage: 9, 
+                damage: 7, 
                 kind: "fire",
                 atk_txt: "You channel all of your strength into your hands. Releasing the fire within"
             },
@@ -113,7 +113,7 @@ impl Spell {
                 name: "Fire Blast", 
                 description: "Slower to cast than a fireball, but sure to get the job done", 
                 speed: 2, 
-                damage: 9, 
+                damage: 7, 
                 kind: "fire",
                 atk_txt: "You channel all of your strength into your hands. Releasing the fire within"
             },
@@ -132,6 +132,58 @@ impl Spell {
                 damage: 2, 
                 kind: "lightning",
                 atk_txt: "You throw your arms forward, lightning follows and instantly hits your enemy."
+            },
+            Spell {
+                name: "Ball Lightning", 
+                description: "A dense packet of electricity, slow to cast", 
+                speed: 2, 
+                damage: 2, 
+                kind: "lightning",
+                atk_txt: "You cup both of your hands together, concetrating as much electric potention as you can between them"
+            },
+        }
+    }
+    pub fn load_t3_spells() -> Vec<Spell> {
+        vec!{
+            Spell {
+                name: "Arcane Missle", 
+                description: "A basic bolt of magic energy", 
+                speed: 1, 
+                damage: 4, 
+                kind: "arcane",
+                atk_txt: "Your hands fume with perverse energies, they coalese into a refined point"
+            },
+            Spell {
+                name: "Arcane Barrage", 
+                description: "A basic bolt of magic energy", 
+                speed: 1, 
+                damage: 5, 
+                kind: "arcane",
+                atk_txt: "Your hands fume with twisted energies, You unleash a flurry of it upon your target"
+            },
+            Spell {
+                name: "Fire Blast", 
+                description: "Slower to cast than a fireball, but sure to get the job done", 
+                speed: 2, 
+                damage: 7, 
+                kind: "fire",
+                atk_txt: "You channel all of your strength into your hands. Releasing the fire within"
+            },
+            Spell {
+                name: "Supernova", 
+                description: "A quick and piercing fire spell", 
+                speed: 1, 
+                damage: 10, 
+                kind: "fire",
+                atk_txt: "A wave of intense heat flows from your body in all directions"
+            },
+            Spell {
+                name: "Thunder Storm", 
+                description: "A bolt of dense plasma", 
+                speed: 1, 
+                damage: 4, 
+                kind: "lightning",
+                atk_txt: "You throw your arms forward, A series of bolts rains down on your enemy."
             },
             Spell {
                 name: "Ball Lightning", 
@@ -226,6 +278,46 @@ impl Weapon {
             }
         ]
     }
+    pub fn load_t3_weapons() -> Vec<Weapon> {
+        vec![
+            Weapon {
+                name: "katana",
+                damage: 1,
+                speed: 1,
+                crit: 11,
+                rank: 1,
+                crit_txt: "pierce",
+                atk_txt: "stab",
+            },
+            Weapon {
+                name: "Harded Blade",
+                damage: 4,
+                speed: 2,
+                crit: 5,
+                rank: 1,
+                crit_txt: "imaple",
+                atk_txt: "cut",
+            },
+            Weapon {
+                name: "Tabarzin",
+                damage: 3,
+                speed: 2,
+                crit: 18,
+                rank: 1,
+                crit_txt: "bludgeon",
+                atk_txt: "bash",
+            },
+            Weapon {
+                name: "Ent Sword",
+                damage: 6,
+                speed: 3,
+                crit: 6,
+                rank: 1,
+                crit_txt: "bisect",
+                atk_txt: "slash",
+            }
+        ]
+    }
 }
 
 impl Blessing {
@@ -239,12 +331,17 @@ impl Blessing {
             "Holy Wrath" => {
                 enemy.health -= 4;
                 player.heal(2);
-                println!("The burst of holy energy hits the {} for 4 damage", enemy.name);
+                println!("The burst of holy energy hits the {} for 4 holy damage", enemy.name);
             },
             "Divine Wrath" => {
                 enemy.health -= 6;
                 player.heal(4);
-                println!("The burst of holy energy hits the {} for 6 damage", enemy.name);
+                println!("The burst of holy energy hits the {} for 6 holy damage", enemy.name);
+            },
+            "Sanctified Wrath" => {
+                enemy.health -= 8;
+                player.heal(6);
+                println!("The wave of holy energy hits the {} for 8 holy damage", enemy.name);
             },
             "Protection" => {
                 player.armor += 1;
@@ -258,6 +355,10 @@ impl Blessing {
             "Ancient Knowledge" => {
                 player.int += 1;
                 println!("You intellect increases by 1");
+            }
+            "The Entobile" => {
+                player.devotion += 1;
+                println!("You devotion increases by 1");
             }
             "Sacrafice" => {
                 let dmg = 2 + player.strength/2 + player.int/2 + player.devotion/2 + player.resolve/2;
@@ -382,6 +483,93 @@ impl Blessing {
                 combat_only: true,
                 active_effect: true,
                 invoke_txt: "You pull the surrounding energy into yourself, shielding you from evil."
+            },
+            Blessing {
+                name: "Divine Wrath",
+                description: "Strikes your foe with holy light while healing you",
+                speed: 2,
+                retaliation: true,
+                combat_only: true,
+                active_effect: false,
+                invoke_txt: "You reach your hand to the sky pulling holy energy into your body. Pushing your hands foward you unleash it upon your enemy."
+            },
+            Blessing {
+                name: "Find Weakness",
+                description: "Lowers your enemy's armor",
+                speed: 1,
+                retaliation: false,
+                combat_only: true,
+                active_effect: false,
+                invoke_txt: "Through your prayers you are granted insight"
+            },
+            Blessing {
+                name: "Sacrafice",
+                description: "Sacrafices your health to do great damage to you enemy",
+                speed: 1,
+                retaliation: true,
+                combat_only: true,
+                active_effect: false,
+                invoke_txt: "You stretch arms out wide, pooling all of the surrounding energy within you. 
+                ...Surrounded by Holy Light, you slam your body into you enemy with all of your strengh...
+                        is this it?"
+            },
+        ]
+    }
+    pub fn load_t3_blessings() -> Vec<Blessing> {
+        vec! [
+            Blessing {
+                name: "Greater Heal",
+                description: "A heal that scales with devotion, slower than Heal",
+                speed: 2,
+                retaliation: true,
+                combat_only: false,
+                active_effect: false,
+                invoke_txt: "You bask in a wave of Holy Light, restoring your vitality"
+            },
+            Blessing {
+                name: "Greater Heal",
+                description: "A heal that scales with devotion, slower than Heal",
+                speed: 2,
+                retaliation: true,
+                combat_only: false,
+                active_effect: false,
+                invoke_txt: "You bask in a wave of Holy Light, restoring your vitality"
+            },
+            Blessing {
+                name: "Divine Strength",
+                description: "Increases your strength for this combat",
+                speed: 1,
+                retaliation: false,
+                combat_only: true,
+                active_effect: true,
+                invoke_txt: "You kneel and speak a word of greater power,\n ...your strength increases"
+            },
+            Blessing {
+                name: "Supress",
+                description: "Slightly reduces your enemy's damage for this combat",
+                speed: 1,
+                retaliation: false,
+                combat_only: true,
+                active_effect: false,
+                invoke_txt: "You clasp you hands together and conjure glowing shackles around your foe"
+            },
+            Blessing {
+                name: "Protection",
+                description: "Shrounds you in holy energy, increasing your armor",
+                speed: 1,
+                retaliation: true,
+                combat_only: true,
+                active_effect: true,
+                invoke_txt: "You pull the surrounding energy into yourself, shielding you from evil."
+            },
+            Blessing {
+                name: "Sanctified Wrath",
+                description: "Strikes your foe with holy light while healing you",
+                speed: 2,
+                retaliation: true,
+                combat_only: true,
+                active_effect: false,
+                invoke_txt: "You reach your hand to the sky pulling holy energy into your body. Pushing your hands foward you unleash it upon your enemy."
             },
             Blessing {
                 name: "Divine Wrath",

@@ -78,7 +78,7 @@ impl Floor {
                 special_rooms,
                 boss: Enemy {
                     name: "Sanctum Guardian",
-                    health: 42,
+                    health: 46,
                     dmg_phys: 3,
                     dmg_magic: 0,
                     armor: 10,
@@ -99,11 +99,11 @@ impl Floor {
             }
         } else if floor_number == 3 {
             let enemys = Enemy::load_t3();
-            let spells = Spell::load_t2_spells();
-            let blessings = Blessing::load_t2_blessings(); //TODO: change when designing floor 3
-            let weapons = Weapon::load_t2_weapons(); //TODO: See above
-            let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2];
-            let mut special_rooms: Vec<&'static str> = vec!["hag", "hag"]; //TODO: floor 3 rooms
+            let spells = Spell::load_t3_spells(); //TODO: change when designing floor 3
+            let blessings = Blessing::load_t3_blessings(); 
+            let weapons = Weapon::load_t3_weapons(); 
+            let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2, 4, 4];
+            let mut special_rooms: Vec<&'static str> = vec!["sacrafice3", "hag"]; //TODO: floor 3 rooms
             rooms.insert(rng.gen_range(0,3), 3);
             rooms.shuffle(&mut rng);
             special_rooms.shuffle(&mut rng);
@@ -115,18 +115,21 @@ impl Floor {
                 weapons,
                 special_rooms,
                 boss: Enemy {
-                    name: "This should be the last boss",
+                    name: "Dark Figure",
                     health: 42,
-                    dmg_phys: 300000,
+                    dmg_phys: 3,
                     dmg_magic: 0,
-                    armor: 10,
-                    magic_res: 0,
+                    armor: 4,
+                    magic_res: 2,
                     speed: 3,
-                    crit: 3,
+                    crit: 5,
                     tier: 3,
-                    atk_txt: "boops",
+                    atk_txt: "Throws a blade at",
                     entry_txt: "
-                       last boss text \n"
+                       This is it.
+                       You have mad it to the heart of the great mother.
+                       Her roots drape down all around you and the gold-blue glow of the heart draws you closer.
+                       The dark figure from before steps in between you, it is the reason why you are here. \n"
                 },
                 rooms
             }
@@ -553,7 +556,7 @@ impl Floor {
             Some("hilt") => {
                 println!("
                 A dimly illuminated alter glows in the darkness,
-                There is an ornate blade hilt on next to a pile of scrolls.
+                There is an ornate blade hilt on the alter next to a pile of scrolls.
                 ");
                 match self.get_choice(vec![
                     "Take the hilt",
@@ -576,6 +579,79 @@ impl Floor {
                                 combat_only: false,
                                 active_effect: false,
                                 invoke_txt: "The information contained within this scroll is truely profound"
+                            }
+                        )
+                    }
+                    _ => panic!("sacrafice out of bounds"),
+                }
+            }
+            Some("sacrafice3") => {
+                println!("
+                Along one of the hall you spot a glowing red orb
+                You may be able to make a trade with blood.
+                ");
+                match self.get_choice(vec![
+                    "Touch the orb (-5 health, +3 Max Health)",
+                    "Palm the orb (-8 health, +5 Max Health)",
+                    "It looks evil (leave)",
+                ], player) {
+                    1 => { 
+                        println!("You take 5 damage");
+                        player.max_health += 3;
+                        player.health -= 5;
+                    }
+                    2 => { 
+                        println!("You take 8 damage");
+                        player.health -= 8;
+                        player.max_health += 5;
+                    }
+                    3 => println!("You ignore the orb an hurry along the path"),
+                    _ => panic!("sacrafice out of bounds"),
+                }
+                if player.health <= 0 {
+                    println!("you died");
+                    panic!("");
+                }
+            }
+            Some("Blade") => {
+                println!("
+                A dimly illuminated alter glows in the darkness,
+                There is an engraved blade with with no hilt on the alter next to a book.
+                ");
+                match self.get_choice(vec![
+                    "Take the blade",
+                    "take the book",
+                ], player) {
+                    1 => {  
+                        if player.hilt {
+                            println!("You grab the blade, this must go with the hilt you found earlier. \n sure enough the two fit perfectly together");
+                            player.weapons.push(Weapon {
+                                name: "Onodreem's Great Blade",
+                                damage: 5,
+                                speed: 2,
+                                crit: 10,
+                                rank: 1,
+                                crit_txt: "Reign down slices upon",
+                                atk_txt: "Gracefully Cut",
+                            });
+                            println!("You recieve Onodreem's Great Blade");
+                        } else {
+                            println!("You take the blade being careful not to cut yourself");
+                        }
+                    }
+                    2 => {
+                        println!("you grab the dusty old book");
+                        println!("you receive The Entobile");
+                        self.get_random_spell(player, 1);
+                        player.blessings.push(
+                            Blessing {
+                                name: "The Entobile",
+                                description: "The Holy book of the Ents, few copies exist",
+                                speed: 1,
+                                retaliation: false,
+                                combat_only: false,
+                                active_effect: false,
+                                invoke_txt: "Reading the passages contained within the tomb both touch and enlighten you"
                             }
                         )
                     }

@@ -84,6 +84,11 @@ impl Player {
                 target.health -= dmg_amt;
                 println!("you {} the {} with your {} for {} damage", self.weapon.atk_txt, target.name, self.weapon.name, dmg_amt);
             }
+            if self.weapon.name == "Onodreem's Great Blade" {
+                target.health -= 1;
+                println!("You hit the {} for 1 Holy Damage", target.name);
+            }
+
             thread::sleep(time::Duration::from_millis(600));
         }
         println!();
