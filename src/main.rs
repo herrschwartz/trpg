@@ -50,8 +50,22 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
             None => println!("unknown command type 'help' for availible commands"),
             _ => println!("unknown command, type 'help' for availible commands"),
         }
+
+        // BOSS stuff, jank
+        if enemy.name == "Dark Figure" {
+            if turn_counter == 1 {
+                println!("The dark figure holds out its hand and conjures a weapon that mirrors yours.");
+                enemy.dmg_phys = player.weapon.damage;
+                enemy.crit = player.weapon.crit;
+                enemy.atk_txt = player.weapon.atk_txt;
+                enemy.speed = player.weapon.speed;
+            }
+        }
+        if enemy.name == "Dark Ent" {
+            enemys::dark_ent(turn_counter, player);
+        }
         if enemy.name == "Sanctum Guardian" {
-            sanctum_guardian(turn_counter, enemy);
+            enemys::sanctum_guardian(turn_counter, enemy);
         }
         turn_counter += 1;
     }
@@ -78,25 +92,6 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
 
     true
 }
-
-fn sanctum_guardian(turn_counter: i32, mut enemy: &mut Enemy) {
-    if turn_counter % 3 == 0 {
-        if enemy.magic_res == 0 {
-            println!("The Guardians's body and limbs glow with magic runes");
-            enemy.magic_res = 10;
-            enemy.armor = 1;
-            enemy.dmg_phys = 0;
-            enemy.dmg_magic = 3;
-        } else {
-            println!("The Guardian's outer shell hardens, the runes stop glowing");
-            enemy.magic_res = 0;
-            enemy.armor = 10;
-            enemy.dmg_phys = 3;
-            enemy.dmg_magic = 0;
-        }
-    }
-}
-
 
 fn main() {
     let mut player = Player::new();
@@ -129,7 +124,19 @@ fn main() {
             None => {
                 if !combat(&mut player, &mut floor.boss) {
                     break;
-                };
+                }
+                if floor.floor_number == 3 {
+                    let mut final_boss_p2 = Enemy::final_boss_phase_2();
+                    thread::sleep(time::Duration::from_millis(3500));
+                    if !combat(&mut player, &mut final_boss_p2) {
+                        break;
+                    }
+                    println!("It's finally over. The dark intruders have all been defeated. 
+                    You collapse to your knees. Your essence is returns to the great mother as you wilt to dust.");
+                    let mut input = String::new();
+                    stdin().read_line(&mut input).expect("Input Error");
+                    break;
+                }
                 floor = Floor::new(floor.floor_number + 1);
                 floor.print_entry_txt();
             },

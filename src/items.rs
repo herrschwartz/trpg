@@ -338,6 +338,16 @@ impl Blessing {
                 player.heal(4);
                 println!("The burst of holy energy hits the {} for 6 holy damage", enemy.name);
             },
+            "Divine Strike" => {
+                let dmg = 3 + player.devotion;
+                enemy.health -= dmg;
+                println!("Your holy fist hits the {} for {} damage", enemy.name, dmg);
+            },
+            "Holy Strike" => {
+                let dmg = 1 + player.devotion;
+                enemy.health -= dmg;
+                println!("Your holy fist hits the {} for {} damage", enemy.name, dmg);
+            },
             "Sanctified Wrath" => {
                 enemy.health -= 8;
                 player.heal(6);
@@ -354,11 +364,11 @@ impl Blessing {
             }
             "Ancient Knowledge" => {
                 player.int += 1;
-                println!("You intellect increases by 1");
+                println!("Your intellect increases by 1");
             }
             "The Entobile" => {
                 player.devotion += 1;
-                println!("You devotion increases by 1");
+                println!("Your devotion increases by 1");
             }
             "Sacrafice" => {
                 let dmg = 2 + player.strength/2 + player.int/2 + player.devotion/2 + player.resolve/2;
@@ -367,9 +377,14 @@ impl Blessing {
                 player.health -= player.health/2;
                 println!("You take {} damage", player.health/2);
             }
+            "Holy Edge" => player.weapon.crit += 10,
+
             _ => panic!("No cast effect for {}", self.name)
         }
     }
+
+
+
     pub fn load_t1_blessings() -> Vec<Blessing> {
         vec![
             Blessing {
@@ -389,6 +404,15 @@ impl Blessing {
                 combat_only: false,
                 active_effect: false,
                 invoke_txt: "You bask in holy light, restoring your vitality"
+            },
+            Blessing {
+                name: "Holy Strike",
+                description: "Strike with holy energy based on your devotion",
+                speed: 1,
+                retaliation: true,
+                combat_only: true,
+                active_effect: false,
+                invoke_txt: "You concetrate Holy Power into your offhand, once your enemy is close enough you strike"
             },
             Blessing {
                 name: "Holy Strength",
@@ -449,10 +473,19 @@ impl Blessing {
                 invoke_txt: "You bask in a wave of Holy Light, restoring your vitality"
             },
             Blessing {
+                name: "Holy Strike",
+                description: "Strike with holy energy based on your devotion",
+                speed: 1,
+                retaliation: true,
+                combat_only: true,
+                active_effect: false,
+                invoke_txt: "You concetrate Holy Power into your offhand, once your enemy is close enough you strike"
+            },
+            Blessing {
                 name: "Divine Strength",
                 description: "Increases your strength for this combat",
                 speed: 1,
-                retaliation: false,
+                retaliation: true,
                 combat_only: true,
                 active_effect: true,
                 invoke_txt: "You kneel and speak a word of greater power,\n ...your strength increases"
@@ -503,6 +536,15 @@ impl Blessing {
                 invoke_txt: "Through your prayers you are granted insight"
             },
             Blessing {
+                name: "Holy Edge",
+                description: "Increases your weapons critical hit chnace for this combat",
+                speed: 1,
+                retaliation: false,
+                combat_only: true,
+                active_effect: true,
+                invoke_txt: "You bring the palm of your hand to your lips, speaking a word softly into it. You place your hand on the edge of your weapon, imbuing it with holy energy."
+            },
+            Blessing {
                 name: "Sacrafice",
                 description: "Sacrafices your health to do great damage to you enemy",
                 speed: 1,
@@ -539,10 +581,19 @@ impl Blessing {
                 name: "Divine Strength",
                 description: "Increases your strength for this combat",
                 speed: 1,
-                retaliation: false,
+                retaliation: true,
                 combat_only: true,
                 active_effect: true,
                 invoke_txt: "You kneel and speak a word of greater power,\n ...your strength increases"
+            },
+            Blessing {
+                name: "Divine Strike",
+                description: "Strike with powerful holy energy based on your devotion",
+                speed: 1,
+                retaliation: true,
+                combat_only: true,
+                active_effect: false,
+                invoke_txt: "You concetrate dense Holy Power into your offhand, once your enemy is close enough you strike"
             },
             Blessing {
                 name: "Supress",
@@ -590,6 +641,15 @@ impl Blessing {
                 invoke_txt: "Through your prayers you are granted insight"
             },
             Blessing {
+                name: "Holy Edge",
+                description: "Increases your weapons critical hit chnace for this combat",
+                speed: 1,
+                retaliation: false,
+                combat_only: true,
+                active_effect: true,
+                invoke_txt: "You bring the palm of your hand to your lips, speaking a word softly into it. You place your hand on the edge of your weapon, imbuing it with holy energy."
+            },
+            Blessing {
                 name: "Sacrafice",
                 description: "Sacrafices your health to do great damage to you enemy",
                 speed: 1,
@@ -612,6 +672,7 @@ pub fn remove_effect(player: &mut Player, blessing_name: &'static str) {
             player.armor -= 1;
             player.armor_magic -= 1;
         }
+        "Holy Edge" => player.weapon.crit -= 10,
         _ => panic!("Failed to remove {}", blessing_name)
     }
 }

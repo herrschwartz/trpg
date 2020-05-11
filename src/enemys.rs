@@ -247,6 +247,112 @@ impl Enemy {
             },
         )
     }
+    pub fn final_boss_phase_2() -> Enemy{
+        Enemy {
+            name: "Dark Ent",
+            health: 76,
+            dmg_phys: 3,
+            dmg_magic: 2,
+            armor: 3,
+            magic_res: 2,
+            speed: 2,
+            crit: 5,
+            tier: 3,
+            atk_txt: "punches",
+            entry_txt: "
+               laughing echos deep and slow, rumbling off of the walls.
+               \"You think that you have won?\" the dark figure's voice rasps
+               He pludges his hand down onto a massive root. Drainging power from it.
+               His body twists and transforms before your eyes. branches a room spring from his skin. \n"
+        }
+    }
 }
+
+pub fn sanctum_guardian(turn_counter: i32, mut enemy: &mut Enemy) {
+    if turn_counter % 3 == 0 {
+        if enemy.magic_res == 0 {
+            println!("The Guardians's body and limbs glow with magic runes");
+            enemy.magic_res = 10;
+            enemy.armor = 1;
+            enemy.dmg_phys = 0;
+            enemy.dmg_magic = 3;
+        } else {
+            println!("The Guardian's outer shell hardens, the runes stop glowing");
+            enemy.magic_res = 0;
+            enemy.armor = 10;
+            enemy.dmg_phys = 3;
+            enemy.dmg_magic = 0;
+        }
+    }
+}
+
+pub fn dark_ent(turn_counter: i32, mut player: &mut Player) {
+    if turn_counter % 2 == 0 {
+        let swap1: &str;
+        let swap2: &str;
+        match player.gen.gen_range(0,3) {
+            0 => {
+                let tmp = player.strength;
+                swap1 = "Strength";
+                match player.gen.gen_range(0,2){
+                    0 => {
+                        swap2 = "Intellect";
+                        player.strength = player.int;
+                        player.int = tmp;
+                    }
+                    1 => {
+                        swap2 = "Devotion";
+                        player.strength = player.devotion;
+                        player.devotion = tmp;
+                    }
+                    _ => panic!("swap fail")
+                } 
+            }
+            1 => {
+                let tmp = player.int;
+                swap1 = "Intellect";
+                match player.gen.gen_range(0,2){
+                    0 => {
+                        swap2 = "Strength";
+                        player.int = player.strength;
+                        player.strength = tmp;
+                    }
+                    1 => {
+                        swap2 = "Devotion";
+                        player.int = player.devotion;
+                        player.devotion = tmp;
+                    }
+                    _ => panic!("swap fail")
+                } 
+            }
+            2 => {
+                let tmp = player.devotion;
+                swap1 = "Devotion";
+                match player.gen.gen_range(0,2){
+                    0 => {
+                        swap2 = "Strength";
+                        player.devotion = player.strength;
+                        player.strength = tmp;
+                    }
+                    1 => {
+                        swap2 = "Intellect";
+                        player.devotion = player.int;
+                        player.int = tmp;
+                    }
+                    _ => panic!("swap fail")
+                } 
+            }
+            _ => panic!("out of range for final boss!")
+        }
+        println!("Dark energies flow through the air, distorting reality. Your {} and {} are swapped", swap1, swap2);
+    }
+    if turn_counter % 3 == 0 {
+        player.health -= turn_counter/2;
+        println!("The Dark Ent moans out a truely aweful sound. He thrusts out his hands wildly sending a black orb right at you.");
+        println!("You take {} damage", turn_counter/2);
+    }
+}
+
+
 
 

@@ -65,7 +65,7 @@ impl Floor {
             let blessings = Blessing::load_t2_blessings();
             let weapons = Weapon::load_t2_weapons(); 
             let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2, 4, 4];
-            let mut special_rooms: Vec<&'static str> = vec!["enchant", "sacrafice2", "hilt", "resolve"]; //TODO: floor 2 rooms
+            let mut special_rooms: Vec<&'static str> = vec!["enchant", "sacrafice2", "hilt", "resolve"];
             rooms.insert(rng.gen_range(0,3), 3);
             rooms.shuffle(&mut rng);
             special_rooms.shuffle(&mut rng);
@@ -99,11 +99,11 @@ impl Floor {
             }
         } else if floor_number == 3 {
             let enemys = Enemy::load_t3();
-            let spells = Spell::load_t3_spells(); //TODO: change when designing floor 3
+            let spells = Spell::load_t3_spells();
             let blessings = Blessing::load_t3_blessings(); 
             let weapons = Weapon::load_t3_weapons(); 
             let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2, 4, 4];
-            let mut special_rooms: Vec<&'static str> = vec!["sacrafice3", "hag"]; //TODO: floor 3 rooms
+            let mut special_rooms: Vec<&'static str> = vec!["sacrafice3", "blade"]; //TODO: floor 3 rooms
             rooms.insert(rng.gen_range(0,3), 3);
             rooms.shuffle(&mut rng);
             special_rooms.shuffle(&mut rng);
@@ -119,12 +119,12 @@ impl Floor {
                     health: 42,
                     dmg_phys: 3,
                     dmg_magic: 0,
-                    armor: 4,
+                    armor: 3,
                     magic_res: 2,
-                    speed: 3,
+                    speed: 2,
                     crit: 5,
                     tier: 3,
-                    atk_txt: "Throws a blade at",
+                    atk_txt: "punches",
                     entry_txt: "
                        This is it.
                        You have mad it to the heart of the great mother.
@@ -185,7 +185,7 @@ impl Floor {
         }
     }
 
-    pub fn get_choice(&self, choices: Vec<&'static str>, player: &Player,) -> usize {
+    pub fn get_choice(&self, choices: Vec<&str>, player: &Player,) -> usize {
         for (i, item) in choices.iter().enumerate() {
             println!("{}) {}", i+1, item)
         }
@@ -613,7 +613,7 @@ impl Floor {
                     panic!("");
                 }
             }
-            Some("Blade") => {
+            Some("blade") => {
                 println!("
                 A dimly illuminated alter glows in the darkness,
                 There is an engraved blade with with no hilt on the alter next to a book.
@@ -658,6 +658,56 @@ impl Floor {
                     _ => panic!("sacrafice out of bounds"),
                 }
             }
+            Some ("magician") => {
+                println!("
+                You come across a sharply dressed woman, leaning against the trunk on the side of the ramp
+                How did she get down here?
+                \"Hey there, I offed a cleric a ways back but these holy spells are no good for me. All I want in return is a real magic spell of my choice.\" 
+                She smirks at you, waiting for your response.");
+                match self.get_choice(vec![
+                    "Accept her offer (-1 spell, gain blessings)",
+                    "politely decline",
+                    "Slay the witch",
+                ], player) {
+                    1 => {
+                        let sp = player.spells.remove(player.gen.gen_range(0, player.spells.len()));
+                        println!("{} Removed", sp.name);
+                        player.blessings.push(            
+                            Blessing {
+                                name: "Heal",
+                                description: "A basic heal that scales with devotion",
+                                speed: 1,
+                                retaliation: true,
+                                combat_only: false,
+                                active_effect: false,
+                                invoke_txt: "You bask in holy light, restoring your vitality"
+                            }
+                        );
+                        player.blessings.push(           
+                            Blessing {
+                                name: "Greater Heal",
+                                description: "A heal that scales with devotion, slower than Heal",
+                                speed: 2,
+                                retaliation: true,
+                                combat_only: false,
+                                active_effect: false,
+                                invoke_txt: "You bask in a wave of Holy Light, restoring your vitality"
+                            }
+                        );
+                        thread::sleep(time::Duration::from_millis(600));
+                        println!("You recieved Greater Heal");
+                        thread::sleep(time::Duration::from_millis(600));
+                        println!("You recieved Heal");
+                        thread::sleep(time::Duration::from_millis(600));
+                        println!("A good trade indeed.");
+                    }
+                    2 => println!("You decline and continue on the path"),
+                    3 => {
+                        //combat
+                    }
+                    _ => panic!("Error in Magician event!")
+                }
+            }         
             
             None => println!("Somehow all of the special rooms are exhausted"),
             _ => panic!("There was in error in special rooms"),
