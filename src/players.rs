@@ -4,6 +4,7 @@ use crate::LEVELS;
 use rand::prelude::*;
 use std::io::stdin;
 use std::{thread, time};
+use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 
 pub struct Player {
@@ -63,7 +64,7 @@ impl Player {
         if self.health > self.max_health {
             self.health = self.max_health
         }
-        println!("You heal for {}", amount);
+        self.print_green(&format!("You heal for {}\n", amount));
     }
 
     pub fn attack(&mut self, target: &mut Enemy) {
@@ -79,7 +80,9 @@ impl Player {
 
             if self.weapon.crit >= self.gen.gen_range(1, 101) {
                 target.health -= dmg_amt * 2;
-                println!("you {} the {} with your {} for {} damage!!", self.weapon.crit_txt, target.name, self.weapon.name, dmg_amt * 2);
+                print!("you ");
+                self.print_red(self.weapon.crit_txt);
+                println!(" the {} with your {} for {} damage!!", target.name, self.weapon.name, dmg_amt * 2);
             } else {
                 target.health -= dmg_amt;
                 println!("you {} the {} with your {} for {} damage", self.weapon.atk_txt, target.name, self.weapon.name, dmg_amt);
@@ -264,12 +267,14 @@ impl Player {
     }
 
     pub fn give_lifeforce(&mut self, amount: i32) {
-        println!("You gain {} Lifeforce", amount);
+        print!("You gain {} ", amount);
+        self.print_yellow("Lifeforce\n");
         self.lifeforce += amount;
     }
 
     pub fn give_exp(&mut self, amount: i32) {
-        println!("You gain {} exp", amount);
+        print!("You gain {} ", amount);
+        self.print_yellow("exp\n");
         self.exp += amount;
         if self.exp >= LEVELS[(self.level - 1) as usize] {
             println!("Ding! you leveled up!");
@@ -284,10 +289,51 @@ impl Player {
                 self.weapons.push(self.weapon.clone());
                 self.weapon = self.weapons[weapon].clone();
                 self.weapons.remove(weapon);
-                println!("{} has been equiped", weapon_name);
+                self.print_yellow(&weapon_name);
+                println!(" has been equiped");
             }
             None => println!("You don't have a weapon in your inventory named {}", weapon_name)
         }
+    }
+
+    pub fn print_purple(&self, text: &str) {
+        let mut stdout = StandardStream::stdout(ColorChoice::Always);
+        let mut cs = ColorSpec::new();
+        cs.set_fg(Some(Color::Magenta));
+        stdout.set_color(&cs).expect("color_err");
+        print!("{}", text);
+        cs.clear();
+        stdout.set_color(&cs).expect("color_clear_err");
+    }
+
+    pub fn print_red(&self, text: &str) {
+        let mut stdout = StandardStream::stdout(ColorChoice::Always);
+        let mut cs = ColorSpec::new();
+        cs.set_fg(Some(Color::Red));
+        stdout.set_color(&cs).expect("color_err");
+        print!("{}", text);
+        cs.clear();
+        stdout.set_color(&cs).expect("color_clear_err");
+    }
+
+    pub fn print_yellow(&self, text: &str) {
+        let mut stdout = StandardStream::stdout(ColorChoice::Always);
+        let mut cs = ColorSpec::new();
+        cs.set_fg(Some(Color::Yellow));
+        stdout.set_color(&cs).expect("color_err");
+        print!("{}", text);
+        cs.clear();
+        stdout.set_color(&cs).expect("color_clear_err");
+    }
+
+    pub fn print_green(&self, text: &str) {
+        let mut stdout = StandardStream::stdout(ColorChoice::Always);
+        let mut cs = ColorSpec::new();
+        cs.set_fg(Some(Color::Green));
+        stdout.set_color(&cs).expect("color_err");
+        print!("{}", text);
+        cs.clear();
+        stdout.set_color(&cs).expect("color_clear_err");
     }
 }
 

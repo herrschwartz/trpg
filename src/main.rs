@@ -10,7 +10,7 @@ use players::Player;
 use std::{thread, time};
 use items::remove_effect;
 
-static LEVELS: [i32; 12] = [5, 10, 20, 35, 50, 65, 85, 100, 400, 600, 800, 1000];
+static LEVELS: [i32; 12] = [5, 10, 20, 35, 50, 65, 85, 100, 200, 600, 800, 1000];
 
 fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
     println!("{}", enemy.entry_txt);
@@ -54,8 +54,7 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
         // BOSS stuff, jank
         if enemy.name == "Dark Figure" {
             if turn_counter == 1 {
-                println!("The dark figure holds out its hand and conjures a weapon that mirrors yours.");
-                enemy.dmg_phys = player.weapon.damage;
+                player.print_purple("The dark figure holds out its hand and conjures a weapon that mirrors yours.\n");
                 enemy.crit = player.weapon.crit;
                 enemy.atk_txt = player.weapon.atk_txt;
                 enemy.speed = player.weapon.speed;
@@ -65,7 +64,7 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
             enemys::dark_ent(turn_counter, player);
         }
         if enemy.name == "Sanctum Guardian" {
-            enemys::sanctum_guardian(turn_counter, enemy);
+            enemys::sanctum_guardian(turn_counter, enemy, player);
         }
         turn_counter += 1;
     }
@@ -95,7 +94,9 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
 
 fn main() {
     let mut player = Player::new();
-    println!("Welcome, at any point you can enter 'help' to get information on commands");
+    print!("Welcome, at any point you can enter ");
+    player.print_yellow("'help' ");
+    println!("to get information on commands");
     player.level_up(3, 0, true);
 
     let mut floor = Floor::new(1);
@@ -151,12 +152,16 @@ fn main() {
                 _ => panic!("Out of bounds for devotion chance")
             }
         }
-        rest(&mut player);
+        rest(&mut player, &floor);
     }
 }
 
-fn rest(player: &mut Player) {
+fn rest(player: &mut Player, floor: &Floor) {
     println!("You have a moment to gather yourself, if you need it.");
+    if floor.rooms.len() == 0 {
+        print!("The room ahead looks ");
+        player.print_red("dangerous\n");
+    }
     loop {
         let mut input = String::new();
         stdin().read_line(&mut input).expect("Input Error");

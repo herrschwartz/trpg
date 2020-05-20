@@ -27,7 +27,9 @@ impl Enemy {
 
         if self.crit >= player.gen.gen_range(1, 101) {
             player.health -= dmg_amt * 2;
-            println!("The {} Crits you for {} damage!! \n", self.name, dmg_amt * 2)
+            print!("The {} ", self.name);
+            player.print_red("Crits ");
+            println!("you for {} damage!! \n", dmg_amt * 2);
         } else {
             player.health -= dmg_amt;
             println!("The {} {} you for {} damage \n", self.name, self.atk_txt, dmg_amt)
@@ -268,16 +270,16 @@ impl Enemy {
     }
 }
 
-pub fn sanctum_guardian(turn_counter: i32, mut enemy: &mut Enemy) {
+pub fn sanctum_guardian(turn_counter: i32, mut enemy: &mut Enemy, player: &Player) {
     if turn_counter % 3 == 0 {
         if enemy.magic_res == 0 {
-            println!("The Guardians's body and limbs glow with magic runes");
+            player.print_purple("The Guardians's body and limbs glow with magic runes\n");
             enemy.magic_res = 10;
             enemy.armor = 1;
             enemy.dmg_phys = 0;
             enemy.dmg_magic = 3;
         } else {
-            println!("The Guardian's outer shell hardens, the runes stop glowing");
+            player.print_purple("The Guardian's outer shell hardens, the runes stop glowing\n");
             enemy.magic_res = 0;
             enemy.armor = 10;
             enemy.dmg_phys = 3;
@@ -344,11 +346,11 @@ pub fn dark_ent(turn_counter: i32, mut player: &mut Player) {
             }
             _ => panic!("out of range for final boss!")
         }
-        println!("Dark energies flow through the air, distorting reality. Your {} and {} are swapped", swap1, swap2);
+        player.print_purple(&format!("Dark energies flow through the air, distorting reality. Your {} and {} are swapped\n", swap1, swap2));
     }
     if turn_counter % 3 == 0 {
         player.health -= turn_counter/2;
-        println!("The Dark Ent moans out a truely aweful sound. He thrusts out his hands wildly sending a black orb right at you.");
+        player.print_purple("The Dark Ent moans out a truely aweful sound. He thrusts out his hands wildly sending a black orb right at you.\n");
         println!("You take {} damage", turn_counter/2);
     }
 }

@@ -66,9 +66,9 @@ impl Floor {
             let weapons = Weapon::load_t2_weapons(); 
             let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2, 4, 4];
             let mut special_rooms: Vec<&'static str> = vec!["enchant", "sacrafice2", "hilt", "resolve"];
-            rooms.insert(rng.gen_range(0,3), 3);
             rooms.shuffle(&mut rng);
             special_rooms.shuffle(&mut rng);
+            rooms.insert(rng.gen_range(0,3), 3);
             return Floor {
                 floor_number,
                 enemys,
@@ -103,9 +103,9 @@ impl Floor {
             let blessings = Blessing::load_t3_blessings(); 
             let weapons = Weapon::load_t3_weapons(); 
             let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2, 4, 4];
-            let mut special_rooms: Vec<&'static str> = vec!["sacrafice3", "blade"]; //TODO: floor 3 rooms
-            rooms.insert(rng.gen_range(0,3), 3);
+            let mut special_rooms: Vec<&'static str> = vec!["sacrafice3", "blade", "magician", "trivia"]; //TODO: floor 3 rooms
             rooms.shuffle(&mut rng);
+            rooms.insert(rng.gen_range(0,3), 3);
             special_rooms.shuffle(&mut rng);
             return Floor {
                 floor_number,
@@ -116,7 +116,7 @@ impl Floor {
                 special_rooms,
                 boss: Enemy {
                     name: "Dark Figure",
-                    health: 42,
+                    health: 44,
                     dmg_phys: 3,
                     dmg_magic: 0,
                     armor: 3,
@@ -252,6 +252,7 @@ impl Floor {
                         atk_txt: "bites",
                         entry_txt: "The chest springs to life and leaps at you, trying to devour you with its gaping teeth! \n"
                     }) {
+                        println!("You have died");
                         panic!(""); //this is lazy af
                     }
                 }
@@ -511,7 +512,7 @@ impl Floor {
                 ], player) {
                     1 => {
                         if player.lifeforce >= 10 {
-                            println!("You dip your {} in the light, critical strike chance increases by 5%", player.weapon.name);
+                            println!("You dip your {} in the light, its critical strike chance increases by 5%", player.weapon.name);
                             player.weapon.crit += 5;
                             player.lifeforce -= 10;
                         }
@@ -666,8 +667,8 @@ impl Floor {
                 She smirks at you, waiting for your response.");
                 match self.get_choice(vec![
                     "Accept her offer (-1 spell, gain blessings)",
-                    "politely decline",
-                    "Slay the witch",
+                    "Politely decline (leave)",
+                    "Slay the witch (+1 spell)",
                 ], player) {
                     1 => {
                         let sp = player.spells.remove(player.gen.gen_range(0, player.spells.len()));
@@ -699,15 +700,113 @@ impl Floor {
                         thread::sleep(time::Duration::from_millis(600));
                         println!("You recieved Heal");
                         thread::sleep(time::Duration::from_millis(600));
-                        println!("A good trade indeed.");
+                        println!("\"A good trade indeed.\" She gives you a wink");
                     }
                     2 => println!("You decline and continue on the path"),
                     3 => {
                         //combat
+                        if !combat( player, &mut Enemy {
+                                name: "Dark Magician Girl",
+                                health: 26,
+                                dmg_phys: 0,
+                                dmg_magic: 5,
+                                armor: 2,
+                                magic_res: 3,
+                                speed: 2,
+                                crit: 6,
+                                tier: 3,
+                                atk_txt: "casts a firball at",
+                                entry_txt: "\"Fine then, looks like I'll just have to take you out too\" \n"
+                            }
+                        ) {
+                            println!("You have died");
+                            panic!("");
+                        }
+                        self.get_random_spell(player, 1);
                     }
                     _ => panic!("Error in Magician event!")
                 }
             }         
+            Some("trivia") => {
+                println!("
+                An hunched old man come running up to you with a crazed look.
+                One eye looks right at you, the other somewhere off in the distance
+                \"Ahh traveler, answer my question correctly and recieve a prize!\""
+                );
+                match self.get_choice(vec![
+                    "Ok", 
+                    "Slay the old man",    
+                ], player) {
+                    1 => println!(),
+                    2 => println!("You swing your weapon at the old man but it passes right through him \n\"Heheheh, ok funny guy. On with the questions!\" "),
+                    _ => panic!("old man"),
+                }
+                let mut correct = false;
+                match player.gen.gen_range(0, 3){
+                    0 => {
+                        println!("How many planets are directly visable to the naked eye at night?");
+                        match self.get_choice(vec![
+                            "4", 
+                            "5",  
+                            "6",  
+                        ], player) {
+                            1 => println!("\"Sorry, try again next time! heheheh\""),
+                            2 => correct = true,
+                            3 => println!("\"Sorry, try again next time! heheheh\""),
+                            _ => panic!("planet error")
+                        }
+                    }
+                    1 => {
+                        println!("How many years does it take for a Red Oak to start producing acorns?");
+                        match self.get_choice(vec![
+                            "20-30 years", 
+                            "40-50 years",  
+                            "90-100 years",  
+                        ], player) {
+                            1 => correct = true,
+                            2 => println!("\"Sorry, try again next time! heheheh\""),
+                            3 => println!("\"Sorry, try again next time! heheheh\""),
+                            _ => panic!("acorn error")
+                        }
+                    }
+                    2 => {
+                        println!("Which of these is not a true berry?");
+                        match self.get_choice(vec![
+                            "Strawberry", 
+                            "Blueberry",  
+                            "Banana",  
+                        ], player) {
+                            1 => correct = true,
+                            2 => println!("\"Sorry, try again next time! heheheh\""),
+                            3 => println!("\"Sorry, try again next time! heheheh\""),
+                            _ => panic!("berry error")
+                        }
+                    }
+                    3 => {
+                        println!("The bark of which of these trees is a painkiller?");
+                        match self.get_choice(vec![
+                            "Aspen", 
+                            "Birch",  
+                            "Willow",  
+                        ], player) {
+                            1 => println!("\"Sorry, try again next time! heheheh\""),
+                            2 => println!("\"Sorry, try again next time! heheheh\""),
+                            3 => correct = true,
+                            _ => panic!("berry error")
+                        }
+                    }
+                    _=> panic!("error out of range for old man trivia"),
+                }
+                if correct {
+                    println!("\"Good job, You got it right!\"");
+                    self.get_random_blessing(player, 1);
+                    player.heal(10);
+                    thread::sleep(time::Duration::from_millis(600));
+                    println!("The old man fades away before your eyes, was he just an illusion?");
+                    thread::sleep(time::Duration::from_millis(600));
+                    player.give_lifeforce(15);
+                }
+            }
             
             None => println!("Somehow all of the special rooms are exhausted"),
             _ => panic!("There was in error in special rooms"),
