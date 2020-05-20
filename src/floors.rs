@@ -19,6 +19,16 @@ pub struct Floor {
 
 static CHESTS: [&'static str; 6] = ["Gold Chest", "Blue Chest", "Grey Chest", "Purple Chest", "Green Chest", "Black Chest"];
 
+pub fn get_single_command() -> String {
+    let mut input = String::new();
+    stdin().read_line(&mut input).expect("Input Error");
+
+    let cleaned = input.trim().to_lowercase();
+    let mut commands = cleaned.split_whitespace();
+    let cmd = commands.next().unwrap_or_default();
+    cmd.to_owned()
+}
+
 impl Floor {
     pub fn new(floor_number: i32) -> Floor {
         let mut rng = thread_rng();
@@ -42,7 +52,7 @@ impl Floor {
                 boss: Enemy{
                     name: "Foreman",
                     health: 25,
-                    dmg_phys: 2,
+                    dmg_phys: 1,
                     dmg_magic: 0,
                     armor: 1,
                     magic_res: 1,
@@ -103,7 +113,7 @@ impl Floor {
             let blessings = Blessing::load_t3_blessings(); 
             let weapons = Weapon::load_t3_weapons(); 
             let mut rooms: Vec<i32> = vec![1, 1, 1, 1, 1, 2, 4, 4];
-            let mut special_rooms: Vec<&'static str> = vec!["sacrafice3", "blade", "magician", "trivia"]; //TODO: floor 3 rooms
+            let mut special_rooms: Vec<&'static str> = vec!["sacrafice3", "blade", "magician", "trivia"];
             rooms.shuffle(&mut rng);
             rooms.insert(rng.gen_range(0,3), 3);
             special_rooms.shuffle(&mut rng);
@@ -116,7 +126,7 @@ impl Floor {
                 special_rooms,
                 boss: Enemy {
                     name: "Dark Figure",
-                    health: 44,
+                    health: 46,
                     dmg_phys: 3,
                     dmg_magic: 0,
                     armor: 3,
@@ -191,7 +201,7 @@ impl Floor {
         }
         
         loop {
-            let cmd = self.get_single_command();
+            let cmd = get_single_command();
             let choice = cmd.as_str();
             match choice {
                 "1" | "2" | "3" | "4" | "5" | "6" | "7" => {
@@ -211,16 +221,6 @@ impl Floor {
                 _ => println!("Invalid command {} - Enter the number of the choice you wish to choose, type help for availible commands", cmd),
             }
         }
-    }
-
-    pub fn get_single_command(&self) -> String {
-        let mut input = String::new();
-        stdin().read_line(&mut input).expect("Input Error");
-
-        let cleaned = input.trim().to_lowercase();
-        let mut commands = cleaned.split_whitespace();
-        let cmd = commands.next().unwrap_or_default();
-        cmd.to_owned()
     }
 
     pub fn item_room(&self, player: &mut Player) {
@@ -331,7 +331,7 @@ impl Floor {
        }
 
        loop {
-            let cm = self.get_single_command();
+            let cm = get_single_command();
             let cmd = cm.as_str();
             match cmd {
                 "1" | "2" | "3" | "4" | "5" | "6" | "7" => {
@@ -538,9 +538,9 @@ impl Floor {
                     1 => {
                         if player.resolve >= 4 {
                             println!("\"Good I believe you can do it!\"");
-                            player.heal(4);
-                            player.devotion += 1;
-                            println!("Your devotion increases by 1");
+                            player.max_health += 4;
+                            player.print_yellow("Your maximum health increases by 4");
+                            player.heal(5);
                         }
                         else {
                             println!("\"I don't believe you young one\"");
@@ -711,7 +711,7 @@ impl Floor {
                                 dmg_phys: 0,
                                 dmg_magic: 5,
                                 armor: 2,
-                                magic_res: 3,
+                                magic_res: 4,
                                 speed: 2,
                                 crit: 6,
                                 tier: 3,
@@ -720,6 +720,7 @@ impl Floor {
                             }
                         ) {
                             println!("You have died");
+                            thread::sleep(time::Duration::from_millis(2600));
                             panic!("");
                         }
                         self.get_random_spell(player, 1);

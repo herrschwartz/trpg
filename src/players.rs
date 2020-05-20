@@ -1,5 +1,6 @@
 use crate::items::{Spell, Blessing, Weapon};
-use crate::enemys::Enemy;
+use crate::enemys::*;
+use crate::enemys::foreman;
 use crate::LEVELS;
 use rand::prelude::*;
 use std::io::stdin;
@@ -71,6 +72,7 @@ impl Player {
         let num_atks: i32 = (target.speed as f32 / self.weapon.speed as f32).ceil() as i32;
 
         //Player attacks
+        let mut foreman_retaliate = false;
         for _ in 0..num_atks {
             let mut dmg_amt = self.weapon.damage + self.gen.gen_range(1, self.strength) - target.armor;
             if dmg_amt < 0 {dmg_amt = 0}
@@ -87,11 +89,16 @@ impl Player {
                 target.health -= dmg_amt;
                 println!("you {} the {} with your {} for {} damage", self.weapon.atk_txt, target.name, self.weapon.name, dmg_amt);
             }
-            if self.weapon.name == "Onodreem's Great Blade" {
+            if self.weapon.name == "Onodreem's Great Blade" && self.gen.gen_range(0,2) == 0 {
                 target.health -= 1;
-                println!("You hit the {} for 1 Holy Damage", target.name);
+                println!("You hit the {} for 1 Additional ", target.name);
+                self.print_yellow("Holy Damage");
             }
-
+            if target.name == "Foreman" {
+                if dmg_amt <= 0 || dmg_amt >= 1 && self.gen.gen_range(0,4) == 0 {
+                    foreman_retaliate = true;
+                }
+            }
             thread::sleep(time::Duration::from_millis(600));
         }
         println!();
@@ -102,6 +109,9 @@ impl Player {
         //enemy retaliation
         thread::sleep(time::Duration::from_millis(600));
         target.attack(self);
+        if foreman_retaliate {
+            foreman(self);
+        }
     }
 
     pub fn cast_spell(&mut self, target: &mut Enemy, spell_name: String) {

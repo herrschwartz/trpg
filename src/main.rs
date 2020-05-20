@@ -4,6 +4,7 @@ pub mod items;
 pub mod players;
 pub mod enemys;
 pub mod floors;
+pub mod tutorial;
 use floors::Floor;
 use enemys::Enemy;
 use players::Player;
@@ -32,16 +33,23 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
 
         let cleaned = input.trim().to_lowercase();
         let mut commands = cleaned.split_whitespace();
+        let mut action = false;
         match commands.next() {
-            Some("attack") => player.attack(&mut enemy),
-            Some("cast") => player.cast_spell(&mut enemy, commands.map(|x| x.to_string())
-                                                                            .collect::<Vec<String>>()
-                                                                            .join(" ")),
+            Some("attack") => {
+                player.attack(&mut enemy);
+                action = true;
+            },
+            Some("cast") => {
+                player.cast_spell(&mut enemy, commands.map(|x| x.to_string()).collect::<Vec<String>>()
+                                                                         .join(" "));
+                action = true;
+            }
             Some("invoke") => {
             match player.invoke_combat(&mut enemy, commands.map(|x| x.to_string()).collect::<Vec<String>>().join(" ")) {
                     Some(b) => active_effects.push(b),
                     None => (),
                 }
+                action = true;
             },                                                                
             Some("stats") => player.display_stats(),
             Some("inv") => player.display_inventory(),
@@ -52,21 +60,23 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
         }
 
         // BOSS stuff, jank
-        if enemy.name == "Dark Figure" {
-            if turn_counter == 1 {
-                player.print_purple("The dark figure holds out its hand and conjures a weapon that mirrors yours.\n");
-                enemy.crit = player.weapon.crit;
-                enemy.atk_txt = player.weapon.atk_txt;
-                enemy.speed = player.weapon.speed;
+        if action {
+            if enemy.name == "Dark Figure" {
+                if turn_counter == 1 {
+                    player.print_purple("The dark figure holds out its hand and conjures a weapon that mirrors yours.\n");
+                    enemy.crit = player.weapon.crit;
+                    enemy.atk_txt = player.weapon.atk_txt;
+                    enemy.speed = player.weapon.speed;
+                }
             }
+            if enemy.name == "Dark Ent" {
+                enemys::dark_ent(turn_counter, player);
+            }
+            if enemy.name == "Sanctum Guardian" {
+                enemys::sanctum_guardian(turn_counter, enemy, player);
+            }
+            turn_counter += 1;
         }
-        if enemy.name == "Dark Ent" {
-            enemys::dark_ent(turn_counter, player);
-        }
-        if enemy.name == "Sanctum Guardian" {
-            enemys::sanctum_guardian(turn_counter, enemy, player);
-        }
-        turn_counter += 1;
     }
     thread::sleep(time::Duration::from_millis(600));
     println!("The {} is defeated!", enemy.name);
@@ -79,22 +89,25 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
     //remove active effects
     for e in active_effects {
         remove_effect(player, e);
-        println!("{}",e);
     }
-
-    let lf = enemy.tier * 10 - player.gen.gen_range(0, (enemy.tier * 10) / 2 + 1);
-    println!("You absorb {} lifeforce from your enemy", lf);
-    player.lifeforce += lf;
-    thread::sleep(time::Duration::from_millis(600));
-    //grant experiance and level if needed
-    player.give_exp(enemy.tier * 2);
-
+    
+    if enemy.name != "Dark Ent" && enemy.name != "Dark Figure" {
+        let lf = enemy.tier * 10 - player.gen.gen_range(0, (enemy.tier * 10) / 2 + 1);
+        print!("You absorb {} ", lf);
+        player.print_yellow("lifeforce ");
+        println!("from your enemy");
+        player.lifeforce += lf;
+        thread::sleep(time::Duration::from_millis(600));
+        //grant experiance and level if needed
+        player.give_exp(enemy.tier * 2);
+    }
     true
 }
 
 fn main() {
     let mut player = Player::new();
-    print!("Welcome, at any point you can enter ");
+    tutorial::tutorial();
+    print!("At any point you can enter ");
     player.print_yellow("'help' ");
     println!("to get information on commands");
     player.level_up(3, 0, true);

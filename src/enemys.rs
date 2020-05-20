@@ -21,6 +21,7 @@ pub struct Enemy {
 impl Enemy {
     pub fn attack(&mut self, player: &mut Player) {
         let mut dmg_amt = self.dmg_phys + player.gen.gen_range(0, self.tier + 1) - player.armor;
+        if dmg_amt < 0 {dmg_amt = 0}
         let dmg_magic = self.dmg_magic - player.armor_magic;
         if dmg_magic > 0 {dmg_amt += dmg_magic}
         if dmg_amt < 0 {dmg_amt = 0}
@@ -32,7 +33,11 @@ impl Enemy {
             println!("you for {} damage!! \n", dmg_amt * 2);
         } else {
             player.health -= dmg_amt;
-            println!("The {} {} you for {} damage \n", self.name, self.atk_txt, dmg_amt)
+            if self.name == "Dark Figure" {
+                println!("The {} {}s you for {} damage \n", self.name, self.atk_txt, dmg_amt)
+            } else {
+                println!("The {} {} you for {} damage \n", self.name, self.atk_txt, dmg_amt)
+            }
         }
         thread::sleep(time::Duration::from_millis(600));
 
@@ -249,6 +254,7 @@ impl Enemy {
             },
         )
     }
+
     pub fn final_boss_phase_2() -> Enemy{
         Enemy {
             name: "Dark Ent",
@@ -268,6 +274,17 @@ impl Enemy {
                His body twists and transforms before your eyes. branches a room spring from his skin. \n"
         }
     }
+}
+
+pub fn foreman(player: &mut Player) {
+    if player.armor_magic >= 1 {
+       if player.gen.gen_range(0,2) == 0 {
+        return
+       }
+    }
+    player.health -= 1;
+    player.print_purple("The foreman spots an opening!\n");
+    println!("The foreman Zaps your for 1 damage");
 }
 
 pub fn sanctum_guardian(turn_counter: i32, mut enemy: &mut Enemy, player: &Player) {
