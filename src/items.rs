@@ -183,7 +183,7 @@ impl Spell {
                 speed: 1, 
                 damage: 4, 
                 kind: "lightning",
-                atk_txt: "You throw your arms forward, A series of bolts rains down on your enemy."
+                atk_txt: "You throw your arms forward, A series of bolts rains down on your enemy for massive effect"
             },
             Spell {
                 name: "Ball Lightning", 
