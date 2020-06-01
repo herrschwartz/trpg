@@ -22,10 +22,7 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
     let mut turn_counter = 1;
     while enemy.health > 0 {
         if player.health <= 0 {
-            println!("You have died");
-            let mut input = String::new();
-            stdin().read_line(&mut input).expect("Input Error");
-            return false;
+            end_game(player);
         }
 
         let mut input = String::new();
@@ -40,16 +37,15 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
                 action = true;
             },
             Some("cast") => {
-                player.cast_spell(&mut enemy, commands.map(|x| x.to_string()).collect::<Vec<String>>()
-                                                                         .join(" "));
-                action = true;
+                action = player.cast_spell(&mut enemy, commands.map(|x| x.to_string()).collect::<Vec<String>>()
+                                                                                      .join(" "));
             }
             Some("invoke") => {
             match player.invoke_combat(&mut enemy, commands.map(|x| x.to_string()).collect::<Vec<String>>().join(" ")) {
-                    Some(b) => active_effects.push(b),
+                    Some("cast") => action = true,
+                    Some(b) => {active_effects.push(b); action = true}
                     None => (),
                 }
-                action = true;
             },                                                                
             Some("stats") => player.display_stats(),
             Some("inv") => player.display_inventory(),
@@ -91,6 +87,8 @@ fn combat(player: &mut Player, mut enemy: &mut Enemy) -> bool {
         remove_effect(player, e);
     }
     
+    player.score += 100 * enemy.tier;
+
     if enemy.name != "Dark Ent" && enemy.name != "Dark Figure" {
         let lf = enemy.tier * 10 - player.gen.gen_range(0, (enemy.tier * 10) / 2 + 1);
         print!("You absorb {} ", lf);
@@ -139,14 +137,17 @@ fn main() {
                 if !combat(&mut player, &mut floor.boss) {
                     break;
                 }
+                player.score += floor.boss.tier * 1000;
                 if floor.floor_number == 3 {
                     let mut final_boss_p2 = Enemy::final_boss_phase_2();
                     thread::sleep(time::Duration::from_millis(3500));
                     if !combat(&mut player, &mut final_boss_p2) {
                         break;
                     }
+                    player.score += 5000 + player.lifeforce;
                     println!("It's finally over. The dark intruders have all been defeated. 
                     You collapse to your knees. Your essence is returns to the great mother as you wilt to dust.");
+                    println!("Score: {}", player.score);
                     let mut input = String::new();
                     stdin().read_line(&mut input).expect("Input Error");
                     break;
@@ -195,4 +196,10 @@ fn rest(player: &mut Player, floor: &Floor) {
     }
 }
 
-
+fn end_game(player: &Player) {
+    println!("You have died");
+    println!("Score: {}", player.score + player.lifeforce);
+    let mut input = String::new();
+    stdin().read_line(&mut input).expect("Input Error");
+    std::process::exit(0);
+}

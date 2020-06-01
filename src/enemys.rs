@@ -28,11 +28,13 @@ impl Enemy {
 
         if self.crit >= player.gen.gen_range(1, 101) {
             player.health -= dmg_amt * 2;
+            player.score -= dmg_amt * 3;
             print!("The {} ", self.name);
             player.print_red("Crits ");
             println!("you for {} damage!! \n", dmg_amt * 2);
         } else {
             player.health -= dmg_amt;
+            player.score -= dmg_amt;
             if self.name == "Dark Figure" {
                 println!("The {} {}s you for {} damage \n", self.name, self.atk_txt, dmg_amt)
             } else {
@@ -266,11 +268,11 @@ impl Enemy {
             speed: 2,
             crit: 5,
             tier: 3,
-            atk_txt: "punches",
+            atk_txt: "swipes",
             entry_txt: "
                laughing echos deep and slow, rumbling off of the walls.
                \"You think that you have won?\" the dark figure's voice rasps
-               He pludges his hand down onto a massive root. Drainging power from it.
+               He pludges his hand down onto a massive root. Draining power from it.
                His body twists and transforms before your eyes. branches a room spring from his skin. \n"
         }
     }

@@ -5,6 +5,7 @@ use crate::combat;
 use rand::prelude::*;
 use std::io::stdin;
 use std::{thread, time};
+use crate::end_game;
 
 pub struct Floor {
     pub floor_number: i32,
@@ -173,6 +174,7 @@ impl Floor {
             let spell = self.spells[player.gen.gen_range(0, self.spells.len())].clone();
             println!("You recieved {}", spell.name);
             player.spells.push(spell);
+            player.score += 50;
             thread::sleep(time::Duration::from_millis(600));
         }
     }
@@ -182,6 +184,7 @@ impl Floor {
             let blessing = self.blessings[player.gen.gen_range(0, self.blessings.len())].clone();
             println!("You recieved {}", blessing.name);
             player.blessings.push(blessing);
+            player.score += 50;
             thread::sleep(time::Duration::from_millis(600));
         }
     }
@@ -191,6 +194,7 @@ impl Floor {
             let weapon = self.weapons[player.gen.gen_range(0, self.weapons.len())].clone();
             println!("You recieved {}", weapon.name);
             player.weapons.push(weapon);
+            player.score += 100;
             thread::sleep(time::Duration::from_millis(600));
         }
     }
@@ -241,7 +245,7 @@ impl Floor {
                 if player.gen.gen_range(0,20) == 19 {
                     if !combat(player, &mut Enemy {
                         name: "Mimic",
-                        health: 5 + self.floor_number * 5,
+                        health: 4 + self.floor_number * 6,
                         dmg_phys: 2,
                         dmg_magic: 0,
                         armor: 1,
@@ -252,8 +256,7 @@ impl Floor {
                         atk_txt: "bites",
                         entry_txt: "The chest springs to life and leaps at you, trying to devour you with its gaping teeth! \n"
                     }) {
-                        println!("You have died");
-                        panic!(""); //this is lazy af
+                        end_game(player);
                     }
                 }
                 match choice {
@@ -296,11 +299,13 @@ impl Floor {
                             },
                             _=> panic!("Out of range in cursed chest")
                         }
+                        player.score += 100;
                         player.lifeforce += 10;
                         println!("You gain 10 lifeforce");
                     }
                     _ => panic!("Chest does not exist {}", choice),
                 }
+                player.score += 50;
                 break;
             } else {
                 println!("There is no chest there named {} \n example: green chest", input);
@@ -468,8 +473,7 @@ impl Floor {
                     _ => panic!("sacrafice out of bounds"),
                 }
                 if player.health <= 0 {
-                    println!("you died");
-                    panic!("");
+                    end_game(player);
                 }
             }
             Some("sacrafice2") => {
@@ -496,8 +500,7 @@ impl Floor {
                     _ => panic!("sacrafice out of bounds"),
                 }
                 if player.health <= 0 {
-                    println!("you died");
-                    panic!("");
+                    end_game(player);
                 }
             }
             Some("enchant") => {
@@ -610,8 +613,7 @@ impl Floor {
                     _ => panic!("sacrafice out of bounds"),
                 }
                 if player.health <= 0 {
-                    println!("you died");
-                    panic!("");
+                    end_game(player);
                 }
             }
             Some("blade") => {
@@ -636,6 +638,7 @@ impl Floor {
                                 atk_txt: "Gracefully Cut",
                             });
                             println!("You recieve Onodreem's Great Blade");
+                            player.score += 500;
                         } else {
                             println!("You take the blade being careful not to cut yourself");
                         }
@@ -719,9 +722,7 @@ impl Floor {
                                 entry_txt: "\"Fine then, looks like I'll just have to take you out too\" \n"
                             }
                         ) {
-                            println!("You have died");
-                            thread::sleep(time::Duration::from_millis(2600));
-                            panic!("");
+                            end_game(player);
                         }
                         self.get_random_spell(player, 1);
                     }
@@ -812,6 +813,7 @@ impl Floor {
             None => println!("Somehow all of the special rooms are exhausted"),
             _ => panic!("There was in error in special rooms"),
         }
+        player.score += self.floor_number * 50
     }
 
     pub fn print_entry_txt(&self) {

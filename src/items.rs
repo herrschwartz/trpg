@@ -82,7 +82,6 @@ impl Spell {
             },
         }
     }
-
     pub fn load_t2_spells() -> Vec<Spell> {
         vec!{
             Spell {
@@ -229,7 +228,7 @@ impl Weapon {
             },
             Weapon {
                 name: "Claymore",
-                damage: 5,
+                damage: 4,
                 speed: 3,
                 crit: 3,
                 rank: 1,
@@ -271,7 +270,7 @@ impl Weapon {
                 name: "Greatsword",
                 damage: 5,
                 speed: 3,
-                crit: 6,
+                crit: 5,
                 rank: 1,
                 crit_txt: "bisect",
                 atk_txt: "slash",
@@ -284,7 +283,7 @@ impl Weapon {
                 name: "katana",
                 damage: 2,
                 speed: 1,
-                crit: 7,
+                crit: 6,
                 rank: 1,
                 crit_txt: "pierce",
                 atk_txt: "stab",
@@ -311,7 +310,7 @@ impl Weapon {
                 name: "Ent Sword",
                 damage: 6,
                 speed: 3,
-                crit: 8,
+                crit: 6,
                 rank: 1,
                 crit_txt: "bisect",
                 atk_txt: "slash",

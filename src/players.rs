@@ -26,6 +26,8 @@ pub struct Player {
     pub resolve: i32,
     pub devotion: i32,
 
+    pub score: i32,
+
     pub hilt: bool,
 
     pub gen: rand::rngs::ThreadRng
@@ -55,6 +57,7 @@ impl Player {
             resolve: 2,
             devotion: 2,
 
+            score: 0,
             hilt: false,
             gen: rng
         }
@@ -62,6 +65,7 @@ impl Player {
 
     pub fn heal(&mut self, amount: i32) {
         self.health += amount;
+        self.score += amount;
         if self.health > self.max_health {
             self.health = self.max_health
         }
@@ -82,6 +86,7 @@ impl Player {
 
             if self.weapon.crit >= self.gen.gen_range(1, 101) {
                 target.health -= dmg_amt * 2;
+                self.score += dmg_amt * 2;
                 print!("you ");
                 self.print_red(self.weapon.crit_txt);
                 println!(" the {} with your {} for {} damage!!", target.name, self.weapon.name, dmg_amt * 2);
@@ -114,7 +119,7 @@ impl Player {
         }
     }
 
-    pub fn cast_spell(&mut self, target: &mut Enemy, spell_name: String) {
+    pub fn cast_spell(&mut self, target: &mut Enemy, spell_name: String) -> bool{
         let spell_pos = self.spells.iter().position(|x| x.name.to_lowercase() == spell_name); 
         match spell_pos {
             Some(spell_pos) => {
@@ -132,15 +137,19 @@ impl Player {
 
                 println!();
                 if target.health <= 0 {
-                    return 
+                    return true
                 }
                 //enemy attacks back
                 target.attack(self);
 
                 //remove used spell from inventory
                 self.spells.remove(spell_pos);
+                true
             },
-            None => println!("You don't have a spell named {}", spell_name)
+            None => {
+                println!("You don't have a spell named {}", spell_name);
+                return false;
+            }
         }
     }
 
@@ -161,7 +170,7 @@ impl Player {
                 if blessing.active_effect {
                     return Some(blessing.name);
                 }
-                None
+                return Some("cast");
             },
             None => {
                 println!("You don't have a blessing named {}", spell_name);
@@ -210,6 +219,7 @@ impl Player {
 
     pub fn level_up(&mut self, mut choice: i32, random: i32, is_special: bool) {
         //Special circumstances include start of game, and items. otherwise level normally
+        self.score += 150;
         if !is_special {
             self.level += 1;
             self.max_health += 5;
