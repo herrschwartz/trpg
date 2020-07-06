@@ -138,7 +138,7 @@ impl Floor {
                     atk_txt: "punches",
                     entry_txt: "
                        This is it.
-                       You have mad it to the heart of the great mother.
+                       You have made it to the heart of the great mother.
                        Her roots drape down all around you and the gold-blue glow of the heart draws you closer.
                        The dark figure from before steps in between you, it is the reason why you are here. \n"
                 },
