@@ -263,23 +263,26 @@ impl Player {
         }
     }
 
-    pub fn display_inventory(&self) {
+    pub fn display_inventory(&mut self) {
         println!("\nLifeforce: {}", self.lifeforce);
         println!("--------- equipped ---------");
         println!("Weapon: {} - dmg {} spd {} crit {}%", self.weapon.name, self.weapon.damage, self.weapon.speed, self.weapon.crit);
         println!("Armor: Physical {} magic {}", self.armor, self.armor_magic);
         println!("---------------------------- \n");
         println!("Spells:");
+        &self.spells.sort_unstable_by(|a, b| a.name.cmp(b.name));
         for s in &self.spells {
             println!(" {:<14} - {}", s.name, s.description);
         }
         println!();
         println!("Blessings:");
+        &self.blessings.sort_unstable_by(|a, b| a.name.cmp(b.name));
         for b in &self.blessings {
             println!(" {:<14} - {}", b.name, b.description);
         }
         println!();
         println!("Weapons:");
+        &self.weapons.sort_unstable_by(|a, b| a.name.cmp(b.name));
         for t in &self.weapons {
             println!(" {:<14} - dmg {} spd {} crit {}%", t.name, t.damage, t.speed, t.crit);
         }

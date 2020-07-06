@@ -66,7 +66,7 @@ fn tutorial_intro() -> bool{
             "You will have to enter one if you want to do anything",
             "Typing the 'help' command and pressing Enter will give you",
             "A list of availible commands at any point in the game",
-            "Much of the time, like in shops, you will only have Enter a number to select what you want to do",
+            "Much of the time, like in shops, you will only have to Enter a number to select what you want to do",
             "Enter next to continue..."
         ]
     );
@@ -124,7 +124,7 @@ fn tutorial_intro() -> bool{
             "Blessings can only be cast once, you'll need to get another copy to cast the same one again",
             "Some blessings can be used out of combat when you are resting",
             "Heals are an example of this",
-            "Other blessings may only be used in combats",
+            "Other blessings may only be used in combat",
             "A blessing that increases your strength would be an example of this",
             "That's all! Thanks for reading and have fun! Enter next to finish..."
         ]

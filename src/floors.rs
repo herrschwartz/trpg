@@ -199,7 +199,7 @@ impl Floor {
         }
     }
 
-    pub fn get_choice(&self, choices: Vec<&str>, player: &Player,) -> usize {
+    pub fn get_choice(&self, choices: Vec<&str>, player: &mut Player,) -> usize {
         for (i, item) in choices.iter().enumerate() {
             println!("{}) {}", i+1, item)
         }
